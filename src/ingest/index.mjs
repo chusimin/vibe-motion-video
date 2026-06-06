@@ -10,6 +10,7 @@ import {
   subtitleToText, sh, hasBin, truncate, RAW_TEXT_LIMIT,
 } from "./util.mjs";
 import { buildCodeDigest } from "./codedigest.mjs";
+import { collectAssetsFromDir, collectAssetsFromHtml } from "./assets-collect.mjs";
 
 export default async function run(ctx) {
   const { project, flags, positionals, log } = ctx;
@@ -81,6 +82,9 @@ async function ingestUrl(url, project, log) {
   const desc = extractMetaDescription(html);
   const text = htmlToText(html);
   await fs.writeFile(project.p(DIRS.input, "source.txt"), text, "utf8");
+
+  // 增量收集:从页面抽 logo/og:image/图片下载到 00_input/assets/(失败不致命)
+  try { await collectAssetsFromHtml(html, url, project, log); } catch { /* 收集失败不阻断 ingest */ }
 
   const rawText = [
     title && `标题:${title}`,
@@ -295,6 +299,9 @@ async function ingestCode(dir, project, log) {
   const digest = await buildCodeDigest(abs);
   await fs.writeFile(project.p(DIRS.input, "code-digest.md"), digest.markdown, "utf8");
   log.ok(`已生成代码摘要(约 ${digest.fileCount} 文件,关键文件 ${digest.keyFiles.length} 个)`);
+
+  // 增量收集:从源码目录拷 logo/图片到 00_input/assets/(跳过 node_modules/>5MB,失败不致命)
+  try { await collectAssetsFromDir(abs, project, log); } catch { /* 收集失败不阻断 ingest */ }
 
   return {
     title: digest.title,

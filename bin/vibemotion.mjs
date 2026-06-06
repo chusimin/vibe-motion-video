@@ -33,6 +33,7 @@ const ROUTES = {
   config: "config/index.mjs",
   concept: "concept/index.mjs",
   storyboard: "storyboard/index.mjs",
+  assets: "assets/index.mjs",
   voice: "voice/index.mjs",
   render: "render/index.mjs",
   assemble: "assemble/index.mjs",
@@ -91,6 +92,7 @@ vibemotion —— 内容→视频 自动化流水线
   config [init|show]        ② 访谈 → config.json
   concept                   ③ 校验 2-3 方向
   storyboard [validate|plan]④ 分镜 IR + 15s 分段
+  assets [--scene <id>]     ④· 素材闸门:自动绑定 ingest 抓的 + 缺口清单 + ffprobe 校验
   voice <list|synth|...>    ⑤ TTS 配音 + 字幕对齐
   render --chunk N | --all  ⑥ 分段渲染
   assemble                  ⑦ 合成 + QA

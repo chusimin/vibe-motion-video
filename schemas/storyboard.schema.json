@@ -56,7 +56,22 @@
               "motion": { "type": "string", "description": "如 zoom-in / pan-left / ken-burns" },
               "items": { "type": "array", "items": { "type": "string" }, "description": "bullet-list 用" },
               "value": { "type": "string", "description": "stat 用的大数字" },
-              "callouts": { "type": "array", "items": { "type": "object" }, "description": "product-capture 的标注" }
+              "callouts": { "type": "array", "items": { "type": "object" }, "description": "product-capture 的标注" },
+              "assetReq": {
+                "type": "object",
+                "description": "素材需求声明:这个镜头需要什么真实素材(供 `vibemotion assets` 闸门扫描/自动绑定/校验/出缺口清单)",
+                "additionalProperties": false,
+                "properties": {
+                  "kind": { "enum": ["logo", "screenshot", "photo", "icon", "broll", "background"], "description": "素材种类" },
+                  "format": { "enum": ["png", "svg", "jpg", "jpeg", "webp", "mp4", "mov"], "description": "期望格式" },
+                  "minWidth": { "type": "integer", "description": "最小宽度(px)" },
+                  "minHeight": { "type": "integer", "description": "最小高度(px)" },
+                  "aspect": { "type": "string", "description": "期望画幅,如 16:9 / 1:1 / 9:16" },
+                  "transparent": { "type": "boolean", "description": "是否需要透明通道(png alpha)" },
+                  "purpose": { "type": "string", "description": "用途说明,进缺口清单" },
+                  "alternatives": { "type": "array", "items": { "type": "string" }, "description": "替代方案;缺省给:① 你提供 ② 我录屏 ③ 库存图 ④ 改纯动效" }
+                }
+              }
             }
           },
           "bg": { "type": "string", "description": "背景:颜色 / 渐变名 / 素材" },
