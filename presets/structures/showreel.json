@@ -2,102 +2,39 @@
   "id": "showreel",
   "outputType": "showreel",
   "label": "产品 Showreel(功能集锦)",
-  "description": "为一个产品/工具做的高密度功能集锦片。开场 3 秒钩子抓眼,产品登场,逐个功能亮点快剪,数据/效果做背书,落 CTA。节奏偏快、视觉为主、台词精炼。",
-  "defaultDurationSec": 30,
-  "firstSceneSec": 3,
+  "description": "快节奏、高密度的产品功能集锦。每镜很短(1-1.5s)、字极少(1-3字)、大到出血、镜头内持续运动,punch 闪帧当节拍。参考真实 motion 片:均长 1.7s/镜、79% 在 2s 内。",
+  "defaultDurationSec": 20,
+  "firstSceneSec": 1.5,
+  "cutPacing": {
+    "avgShotSec": 1.2,
+    "climaxShotSec": [0.6, 1.0],
+    "punchFlashSec": [0.3, 0.6],
+    "rule": "默认 1-1.5s/镜;高潮段 0.6-1s 快切;段间插 0.3-0.6s 满色 punch 闪帧当节拍重音。比'看着舒服'还要再快一档。"
+  },
+  "textRule": "每镜 1-3 字/词,大到出血;画面变化快,不放长句。长台词拆成多个快镜逐词砸出。",
+  "motionRule": "镜头内全程运动:快进 overshoot(进场 5-8 帧)→ 持续缩放/位移/形变 → 可快出。几乎没有静止 hold。元素(标记/sparkle/底纹)也一直微动。",
   "beats": [
-    {
-      "role": "hook",
-      "purpose": "0-3s 用最炸的一帧/一句抓住眼球:抛出产品能解决的爽点或最惊艳的成品效果,让人停下划动的手。",
-      "priority": 5,
-      "minSec": 2,
-      "idealSec": 3,
-      "maxSec": 4,
-      "suggestedSec": 3,
-      "visualHint": "kinetic-text"
-    },
-    {
-      "role": "problem",
-      "purpose": "(可选)点出目标用户当前的痛点/低效场景,制造\"这说的就是我\"的共鸣,为产品登场铺垫。短内容可省略。",
-      "priority": 2,
-      "minSec": 2,
-      "idealSec": 3,
-      "maxSec": 5,
-      "suggestedSec": 3,
-      "visualHint": "kinetic-text"
-    },
-    {
-      "role": "solution",
-      "purpose": "产品正式登场:打出产品名 + 一句话定位(它是什么、为谁解决什么),配 logo/主界面亮相。",
-      "priority": 5,
-      "minSec": 2.5,
-      "idealSec": 3,
-      "maxSec": 5,
-      "suggestedSec": 3,
-      "visualHint": "title"
-    },
-    {
-      "role": "feature",
-      "purpose": "核心功能亮点 ①:一个功能一个镜头,录屏/界面捕获展示真实操作,配标注与一句卖点。",
-      "priority": 4,
-      "minSec": 3,
-      "idealSec": 4,
-      "maxSec": 7,
-      "suggestedSec": 4,
-      "visualHint": "product-capture"
-    },
-    {
-      "role": "feature",
-      "purpose": "核心功能亮点 ②:第二个差异化功能,feature-reveal 动效逐项展开,强调\"快/简单/效果好\"。",
-      "priority": 3,
-      "minSec": 3,
-      "idealSec": 4,
-      "maxSec": 7,
-      "suggestedSec": 4,
-      "visualHint": "feature-reveal"
-    },
-    {
-      "role": "feature",
-      "purpose": "核心功能亮点 ③:第三个功能或一组小功能快剪,保持节奏密度;3-5 个功能按时长取舍。",
-      "priority": 2,
-      "minSec": 3,
-      "idealSec": 4,
-      "maxSec": 7,
-      "suggestedSec": 4,
-      "visualHint": "product-capture"
-    },
-    {
-      "role": "proof",
-      "purpose": "用数据/效果对比做背书:用户数、节省时间、前后对比、好评等,大数字 + 一句佐证,建立可信度。",
-      "priority": 4,
-      "minSec": 3,
-      "idealSec": 4,
-      "maxSec": 6,
-      "suggestedSec": 4,
-      "visualHint": "stat"
-    },
-    {
-      "role": "cta",
-      "purpose": "行动召唤:打出去哪用、怎么开始(网址/搜索词/二维码),配品牌色收尾定格。",
-      "priority": 5,
-      "minSec": 2,
-      "idealSec": 3,
-      "maxSec": 5,
-      "suggestedSec": 3,
-      "visualHint": "cta"
-    }
+    { "role": "hook", "purpose": "0-1.5s 最炸一帧/一词砸出来,巨字出血,让人停手", "priority": 5, "minSec": 1, "idealSec": 1.5, "maxSec": 2.5, "visualHint": "title" },
+    { "role": "problem", "purpose": "痛点一词,快闪", "priority": 2, "minSec": 0.6, "idealSec": 1, "maxSec": 1.8, "visualHint": "kinetic-text" },
+    { "role": "solution", "purpose": "产品名巨字登场", "priority": 5, "minSec": 1, "idealSec": 1.5, "maxSec": 2.5, "visualHint": "title" },
+    { "role": "feature", "purpose": "功能①:设备框真实操作,1 句卖点≤3字", "priority": 4, "minSec": 0.8, "idealSec": 1.2, "maxSec": 2, "visualHint": "product-capture" },
+    { "role": "feature", "purpose": "功能②:逐项动效快切", "priority": 3, "minSec": 0.6, "idealSec": 1, "maxSec": 1.8, "visualHint": "feature-reveal" },
+    { "role": "feature", "purpose": "功能③:快剪保持密度", "priority": 2, "minSec": 0.6, "idealSec": 1, "maxSec": 1.8, "visualHint": "product-capture" },
+    { "role": "punch", "purpose": "满色闪帧当节拍重音(可多处插入)", "priority": 2, "minSec": 0.3, "idealSec": 0.5, "maxSec": 0.8, "visualHint": "bg-only" },
+    { "role": "proof", "purpose": "巨数字砸出,数字滚动", "priority": 4, "minSec": 0.8, "idealSec": 1.2, "maxSec": 2, "visualHint": "stat" },
+    { "role": "cta", "purpose": "落版召唤,干净收口", "priority": 5, "minSec": 1, "idealSec": 1.5, "maxSec": 2.5, "visualHint": "cta" }
   ],
-  "emotionalArc": "痛 → 转 → 爽 → 燃(情绪要有曲线,别平铺直叙)",
+  "emotionalArc": "痛 → 转 → 爽 → 燃(情绪要有曲线,但全程快)",
   "heroMode60s": {
-    "desc": "60s 英雄片结构(出自实战导演提示词,见 docs/showreel-craft.md)。工作流演示是重头戏。",
+    "desc": "60s 英雄片结构(见 docs/showreel-craft.md)。工作流演示是重头戏。注意:即便 60s 也保持快切,用更多短镜而非更长镜。",
     "beats": [
-      { "role": "hook", "sec": [3, 4], "purpose": "别划走的理由:痛点或最惊艳成品,3 秒内抓人" },
-      { "role": "登场", "sec": 8, "purpose": "痛点 → 产品登场,情绪从痛转到期待" },
-      { "role": "工作流演示", "sec": 22, "purpose": "★重头戏:把产品怎么用一步步演给人看(真实页面/录屏优先)" },
-      { "role": "规模化payoff", "sec": 12, "purpose": "爽点放大:批量/效果/规模感,把'爽'推到'燃'" },
+      { "role": "hook", "sec": [2, 3], "purpose": "别划走的理由:痛点或最惊艳成品" },
+      { "role": "登场", "sec": 6, "purpose": "痛点→产品登场(拆成多个快镜)" },
+      { "role": "工作流演示", "sec": 22, "purpose": "★重头戏:多个 1-1.5s 快镜串成操作流" },
+      { "role": "规模化payoff", "sec": 12, "purpose": "爽点放大,快切到高潮" },
       { "role": "cta", "sec": 12, "purpose": "收尾召唤 + 品牌定格" }
     ]
   },
   "realContentOnly": true,
-  "notes": "重点做\"功能亮点/工作流演示\"段:每个 feature 独立成镜,优先 product-capture(真实录屏)与 feature-reveal(逐项动效)。功能数按总时长伸缩:15s≈2-3 个、30s≈3-4 个、60s 用 heroMode60s 结构。problem 可选,时长紧张时砍掉直接 hook→solution。**做片前先读 docs/showreel-craft.md(情绪曲线+反 slop 清单+审美心法);只用真实产品的色板/文案/素材,禁止编造占位。** 密度拟合:hook/solution/cta priority=5(必选骨架),feature①/proof=4,feature②=3,problem/feature③=2(预算紧先砍)。"
+  "notes": "★快是第一优先级:每镜 1-1.5s、1-3字、大到出血、镜头内持续运动,段间插 0.3-0.6s punch 闪帧。一个'beat'可拆成多个快镜(如 feature 拆成 3 个 0.8s 镜)。15s≈10-14 镜、30s≈20-26 镜。做片前读 docs/types/showreel.md 与 docs/showreel-craft.md;只用真实产品素材,禁止编造占位。"
 }
