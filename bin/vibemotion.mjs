@@ -39,7 +39,11 @@ const ROUTES = {
   assemble: "assemble/index.mjs",
   qa: "assemble/qa.mjs",
   export: "export/index.mjs",
+  teardown: "teardown/index.mjs",
 };
+
+// 不需要项目上下文的命令(自带输入,自带输出目录)
+const NO_PROJECT = new Set(["teardown"]);
 
 async function cmdInit(ctx) {
   const name = ctx.flags.name || ctx.positionals[0];
@@ -98,6 +102,7 @@ vibemotion —— 内容→视频 自动化流水线
   assemble                  ⑦ 合成 + QA
   qa                        ⑦ 单独体检
   export                    ⑧ 导出成片/字幕/音频
+  teardown <视频|目录|URL>  对标拆解:场景切镜+关键帧+contact sheet → shots.csv/语义模板
   status                    查看状态机
   doctor                    环境体检
 
@@ -120,7 +125,10 @@ async function main() {
     if (!route) { log.err(`未知命令: ${cmd}`); help(); process.exit(1); }
 
     const mod = await import(path.join(SRC, route));
-    ctx.project = await Project.resolve({ projectDir: flags.project });
+    // teardown 等命令自带输入/输出,不依赖项目状态机
+    if (!NO_PROJECT.has(cmd)) {
+      ctx.project = await Project.resolve({ projectDir: flags.project });
+    }
     await mod.default(ctx);
   } catch (e) {
     if (e instanceof UserError) { log.err(e.message); process.exit(1); }
