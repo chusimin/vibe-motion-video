@@ -1,0 +1,30 @@
+{
+  "id": "showreel",
+  "label": "Showreel BGM 规格(对标 ObiN/Bohdan/Aftermagics 等 7 条音频)",
+  "bpm": {
+    "range": [100, 150],
+    "default": 124,
+    "note": "快 montage 偏高(140-150);高潮段更快。卡点:剪辑切点落在每 2 拍或 4 拍(124BPM→每拍0.48s,1-1.2s/镜≈每2-3拍切一次,正好接快节奏)。"
+  },
+  "loudness": {
+    "musicBedLUFS": -20,
+    "duckUnderVoDb": -9,
+    "finalLUFS": -14,
+    "note": "无人声时音乐可到 -16;有人声时 duck 到 VO 之下 ~9dB。"
+  },
+  "style": "modern motion design soundtrack, clean editorial tech brand music, minimal premium tone, glossy synth design, busy percussion grid, fast sync points, up-tempo",
+  "variants": {
+    "A": "tighter syncopated electronic groove with crisp rim clicks, short hats, and controlled low kicks",
+    "B": "heavier halftime pulse with deeper kicks, sparse snares, and restrained metallic percussion",
+    "C": "faster broken-beat pattern with shuffled hats, micro fills, and punchy transition hits"
+  },
+  "defaultVariant": "A",
+  "negativePrompt": "no vocals, no lyrics, no acoustic singer-songwriter style, no cinematic orchestra, no trap vocal chops, no copyrighted melody, no lo-fi vinyl noise, no overly distorted drums, no long ambient intro",
+  "promptTemplate": "Create a {duration} second instrumental audio cue for a premium motion design showreel, around {bpm} BPM, matching this style: {style}. Keep a polished tech-brand atmosphere, glossy synth design, clean edit points, risers, impacts, short transitions, and spatial width. Do not use vocals or recognizable melodies. Change only the drum pattern to {variant}. Preserve a clear energy curve that builds to a climax and a clean ending.",
+  "models": ["Suno", "Udio", "ElevenLabs Music", "Stable Audio"],
+  "beatSync": {
+    "rule": "拿到 BGM 后检测 BPM/拍点 → 把分镜 scene 边界吸附到最近拍点(卡点);高潮段每拍或每半拍切。",
+    "hitTimesNote": "参考片的逐拍 hit_times 在用户拆解 audio_analysis.csv;本 skill 用 vibemotion music sync 现场检测所选曲的拍点。"
+  },
+  "source": "拆解 7 条对标片音频(ObiN/Bohdan/Aftermagics/Varchasva/ARIA):BPM 90-148、清亮电子打击、editorial tech 氛围、快 sync points。详见 references/teardowns/showreel/audio.md"
+}
