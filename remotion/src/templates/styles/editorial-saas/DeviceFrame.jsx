@@ -7,10 +7,10 @@
 //   读 scene.visual._mediaSrc(VibeVideo 解析注入)、scene.onScreenText(顶部标签)、
 //   scene.visual.device("phone"|"browser",缺省按画幅猜)。
 import React from "react";
-import { AbsoluteFill, Img, OffthreadVideo, useCurrentFrame, useVideoConfig, interpolate } from "remotion";
+import { AbsoluteFill, Img, OffthreadVideo, useCurrentFrame, useVideoConfig } from "remotion";
 import { GLOBAL_TEXT_STYLE } from "../../../fonts.js";
 import { withAlpha } from "../../../theme.js";
-import { DARK, smoothSpring, readableOn } from "./_shared.jsx";
+import { DARK, snapSpring, readableOn, shotProgress, driftRot, driftXY, driftScale } from "./_shared.jsx";
 
 function isVideoSrc(src) {
   return /\.(mp4|mov|webm|m4v|mkv)(\?|$)/i.test(src || "");
@@ -30,17 +30,23 @@ export default function DeviceFrame({ scene = {}, theme, safeArea, captionsReser
   // 面板色:饱和强调色铺底(ObiN 满绿/满紫),用 accent(1)=绿 当主面板色,克制但有冲击。
   const panel = v.panelColor || accent(1);
 
-  // 入场:整机从下方升入 + 轻 scale。
-  const enter = smoothSpring({ frame, fps, delay: 3, motion: theme.motion });
-  const enterY = (1 - enter) * (size.hero * 0.4);
-  const enterScale = 0.92 + 0.08 * clamp01(enter);
-  const enterOpacity = clamp01(enter * 1.4);
+  // 入场:整机**快**从下方砸入 + 轻 scale(snap overshoot,~6-8 帧到位)。
+  const enter = snapSpring({ frame, fps, delay: 2 });
+  const enterY = (1 - clamp01(enter)) * (size.hero * 0.5);
+  const enterScale = 0.86 + 0.14 * enter; // enter 越过 1 → 砸进来时略冲过再收
+  const enterOpacity = clamp01(enter * 1.6);
 
-  // 慢漂移视差:全程极缓 rotateY/Y 浮动,给体积感(不晃眼)。
-  const t = interpolate(frame, [0, Math.max(1, durationInFrames - 1)], [0, 1], { extrapolateRight: "clamp" });
-  const driftRotY = interpolate(t, [0, 1], [-7, -2]); // 轻微侧转,始终带一点透视
-  const driftRotX = interpolate(t, [0, 1], [3, 1]);
-  const driftY = interpolate(t, [0, 1], [-0.6, 0.6]); // 百分比单位的上下漂
+  // 镜头进度:全程**持续** 3D 漂移(永不静止),来回摆而非单向。
+  const t = shotProgress(frame, durationInFrames);
+  // rotateY 在 -8°..+2° 来回摆(loops=1),rotateX 轻摆,始终带透视体积感。
+  const driftRotY = driftRot(t, { from: -7, to: -3, wobble: 5, loops: 1 });
+  const driftRotX = driftRot(t, { from: 4, to: 1, wobble: 2.2, loops: 1 });
+  // 整机上下 + 左右极轻视差漂(百分比)。
+  const dpar = driftXY(t, { ampX: 1.0, ampY: 0.9, loops: 1 });
+  const driftYpct = dpar.y - 0.4 + 0.8 * t; // 叠一点单向创动,避免完全周期回到原点
+  const driftXpct = dpar.x;
+  // 截图慢推:屏幕内容全程缓慢 scale(1.0→1.08),像镜头慢慢推近 UI。
+  const screenPush = driftScale(t, 1.0, 1.08);
 
   const top = safeArea.top ?? 60;
   const bottom = (safeArea.bottom ?? 60) + captionsReserve;
@@ -108,10 +114,11 @@ export default function DeviceFrame({ scene = {}, theme, safeArea, captionsReser
               frameAR={frameAR}
               radius={radius}
               bezel={bezel}
-              transform={`translateY(${enterY}px) translateY(${driftY}%) scale(${enterScale}) rotateY(${driftRotY}deg) rotateX(${driftRotX}deg)`}
+              transform={`translateY(${enterY}px) translate(${driftXpct}%, ${driftYpct}%) scale(${enterScale}) rotateY(${driftRotY}deg) rotateX(${driftRotX}deg)`}
               opacity={enterOpacity}
               theme={theme}
               isVideo={src ? isVideoSrc(src) : false}
+              screenPush={screenPush}
             />
           </div>
         </div>
@@ -122,7 +129,7 @@ export default function DeviceFrame({ scene = {}, theme, safeArea, captionsReser
 
 // 设备本体：用一个相对画面尺寸的容器（vw 不稳，用 absolute 百分比经父级 flex 居中），
 // 这里用内联固定比例盒（width=frameW of viewport via wrapper），所以放一个定宽包裹。
-function DeviceBody({ src, isPhone, frameW, frameAR, radius, bezel, transform, opacity, theme, isVideo }) {
+function DeviceBody({ src, isPhone, frameW, frameAR, radius, bezel, transform, opacity, theme, isVideo, screenPush = 1 }) {
   const { palette, fonts, size, accent } = theme;
   // 用 CSS：宽度按视口百分比，高度按宽高比。包一层 relative + aspect-ratio。
   return (
@@ -160,7 +167,7 @@ function DeviceBody({ src, isPhone, frameW, frameAR, radius, bezel, transform, o
         {isPhone ? (
           // 手机：屏幕 + 灵动岛缺口
           <div style={{ position: "relative", width: "100%", height: "100%", borderRadius: radius - bezel, overflow: "hidden", background: palette.bg }}>
-            <Screen src={src} isVideo={isVideo} theme={theme} />
+            <Screen src={src} isVideo={isVideo} theme={theme} push={screenPush} />
             {/* 灵动岛 */}
             <div
               style={{
@@ -186,7 +193,7 @@ function DeviceBody({ src, isPhone, frameW, frameAR, radius, bezel, transform, o
               <div style={{ marginLeft: 16, flex: 1, height: "46%", minHeight: 16, borderRadius: 999, background: withAlpha("#FFFFFF", 0.1) }} />
             </div>
             <div style={{ flex: 1, overflow: "hidden", background: palette.bg }}>
-              <Screen src={src} isVideo={isVideo} theme={theme} />
+              <Screen src={src} isVideo={isVideo} theme={theme} push={screenPush} />
             </div>
           </div>
         )}
@@ -196,13 +203,18 @@ function DeviceBody({ src, isPhone, frameW, frameAR, radius, bezel, transform, o
 }
 
 // 屏幕内容：有 media 铺满；无 media 给优雅占位（不黑屏）。
-function Screen({ src, isVideo, theme }) {
+// push:全程缓慢推近(scale),让截图不静止——镜头一直在「看」UI。
+function Screen({ src, isVideo, theme, push = 1 }) {
   const { palette, fonts, size, accent } = theme;
   if (src) {
+    const mediaStyle = {
+      width: "100%", height: "100%", objectFit: "cover",
+      transform: `scale(${push})`, transformOrigin: "center center", willChange: "transform",
+    };
     return isVideo ? (
-      <OffthreadVideo src={src} muted style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+      <OffthreadVideo src={src} muted style={mediaStyle} />
     ) : (
-      <Img src={src} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+      <Img src={src} style={mediaStyle} />
     );
   }
   // 占位：浅底 + 居中提示 + 一条强调色线，呼应「产品 UI 应在此」。
@@ -219,7 +231,7 @@ function Screen({ src, isVideo, theme }) {
         gap: 18,
       }}
     >
-      <div style={{ width: "44%", height: 8, borderRadius: 999, background: accent(0), opacity: 0.85 }} />
+      <div style={{ width: `${44 * push}%`, height: 8, borderRadius: 999, background: accent(0), opacity: 0.85, transition: "none" }} />
       <div
         style={{
           ...GLOBAL_TEXT_STYLE,

@@ -99,3 +99,65 @@ export function smoothSpring({ frame, fps, delay = 0, motion }) {
     },
   });
 }
+
+// ──────────────────────────────────────────────────────────────────────────
+// 快节奏运动原语(对标 ObiN:进场极快带 overshoot ~5-9 帧到位,之后镜头内全程不静止)
+// ──────────────────────────────────────────────────────────────────────────
+
+// snapSpring —— 超脆弹簧:高 stiffness + 低 damping + 低 mass → 约 5-9 帧冲到位并轻微回弹冲过 1。
+// hero 进场专用。返回值会短暂 >1(overshoot),配合 overshootScale/直接乘位移都行。
+// 在 30fps 下:stiffness 340 / damping 13 / mass 0.5 ≈ 第 5 帧已 ~0.9、第 8 帧越过 1.0 再收。
+export function snapSpring({ frame, fps, delay = 0 }) {
+  return spring({
+    frame: frame - delay,
+    fps,
+    config: { damping: 13, mass: 0.5, stiffness: 340, overshoot: true },
+  });
+}
+
+// overshootScale —— 把 snapSpring 的进度折成「从 from 冲到 1、越过一点再收」的 scale。
+// snapSpring 本身已带 overshoot,这里只做线性映射 from→1(spring 越过 1 时输出也越过 1)。
+export function overshootScale(s, from = 0.6) {
+  return from + (1 - from) * s;
+}
+
+// punchIn —— 硬砸:很快从偏大(或偏小)scale 冲到 1,带轻 overshoot。PunchFrame/强调词重音用。
+// 返回 { scale, opacity },delay 后约 4-6 帧到位。amount 越大砸感越猛(从 1+amount 收到 1)。
+export function punchIn({ frame, fps, delay = 0, amount = 0.18 }) {
+  const s = snapSpring({ frame, fps, delay });
+  const scale = 1 + amount - amount * s; // 1+amount → 1(spring 越过 1 → 略 <1 再回,形成砸+顿)
+  const opacity = clampN(s * 2, 0, 1); // 极快显形,避免砸进来时还是透明
+  return { scale, opacity, s };
+}
+
+// 持续缩放 drift:全程缓慢 scale,镜头永不"定死"。t∈[0,1] 为镜头进度。
+// 默认 1.0→1.08 的极缓推进(像 ObiN 满屏字一直在涨)。
+export function driftScale(t, from = 1.0, to = 1.08) {
+  return from + (to - from) * clampN(t, 0, 1);
+}
+
+// 持续位移 drift:正弦 + 线性创动叠加,给 px(或随调用方单位)。镜头内一直在飘,无静止。
+// freq=周期内摆动次数(以秒计需调用方传 tSec),amp=幅度。这里以「镜头进度 t」近似:
+//   x = ampX * sin(t*2π*loops + phase) + creepX * t
+export function driftXY(t, { ampX = 0, ampY = 0, loops = 1, phase = 0, creepX = 0, creepY = 0 } = {}) {
+  const a = clampN(t, 0, 1) * Math.PI * 2 * loops + phase;
+  return {
+    x: ampX * Math.sin(a) + creepX * clampN(t, 0, 1),
+    y: ampY * Math.sin(a + Math.PI / 3) + creepY * clampN(t, 0, 1),
+  };
+}
+
+// 持续旋转/形变 drift:给 deg。线性创动 + 轻正弦,设备框/sparkle/底纹用。
+export function driftRot(t, { from = 0, to = 0, wobble = 0, loops = 1 } = {}) {
+  const tt = clampN(t, 0, 1);
+  return from + (to - from) * tt + wobble * Math.sin(tt * Math.PI * 2 * loops);
+}
+
+// 镜头进度:当前帧 / 镜头总帧。给持续 drift 当 t。end 传 durationInFrames。
+export function shotProgress(frame, durationInFrames) {
+  return clampN(frame / Math.max(1, durationInFrames - 1), 0, 1);
+}
+
+function clampN(v, a, b) {
+  return Math.max(a, Math.min(b, v));
+}

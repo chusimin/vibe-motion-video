@@ -8,9 +8,9 @@
 //
 // props 与 _base/BgOnly.jsx 同款:{ scene, theme, safeArea, captionsReserve, justify }
 import React from "react";
-import { AbsoluteFill, useCurrentFrame, useVideoConfig, interpolate } from "remotion";
+import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
 import { GLOBAL_TEXT_STYLE } from "../../../fonts.js";
-import { DISPLAY_TRACKING, DISPLAY_WEIGHT, punchPalette, readableOn, smoothSpring } from "./_shared.jsx";
+import { DISPLAY_TRACKING, DISPLAY_WEIGHT, punchPalette, readableOn, DARK, punchIn, snapSpring, shotProgress, driftScale } from "./_shared.jsx";
 
 function isHex(s) {
   return typeof s === "string" && /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(s.trim());
@@ -34,14 +34,13 @@ function pickFill(scene, theme) {
 
 export default function PunchFrame({ scene = {}, theme, safeArea, captionsReserve = 0 }) {
   const frame = useCurrentFrame();
-  const { fps } = useVideoConfig();
-  const { motion, size, fonts } = theme;
+  const { fps, durationInFrames } = useVideoConfig();
+  const { size, fonts } = theme;
   const fill = pickFill(scene, theme);
   // 仅显示 onScreenText（填充色走 visual.value/bg，不会被误当文字）。
   const label = scene.onScreenText || "";
 
-  // 满色帧文字配色：亮色块(绿/紫)上用近黑(darkFrame)做「印章」式重音，更狠更高级；
-  // 暗场块上用暖亮底色文字。比单纯亮/暗自动判更有 editorial 分量。
+  // 满色帧文字配色：亮色块(绿/紫)上用近黑(darkFrame)做「印章」式重音；暗场块上用暖亮底色。
   const fg = readableOn(fill) === "#0B0B0C" ? DARK : "#F4F2EC";
 
   const top = safeArea.top ?? 60;
@@ -49,18 +48,20 @@ export default function PunchFrame({ scene = {}, theme, safeArea, captionsReserv
   const left = safeArea.left ?? 60;
   const right = safeArea.right ?? 60;
 
-  // 文字遮罩升出 + 满色帧整体极轻 scale「砸入」感（重音）。
-  const s = smoothSpring({ frame, fps, delay: 2, motion: { ...motion, overshoot: true } });
-  const punchScale = interpolate(clamp01(s), [0, 1], [1.04, 1]); // 轻微回弹收束
-  const textS = smoothSpring({ frame, fps, delay: 5, motion });
-  const reveal = interpolate(clamp01(textS), [0, 1], [40, 0]); // clip inset %
-  const textY = (1 - clamp01(textS)) * (size.hero * 0.12);
-  // 满色帧的字要够大才算「重音」：短词放大占屏；按字数收敛防溢出。
+  // 闪帧:整屏满色立刻铺满(无淡入,色块就是重音)。文字**硬砸**进来:
+  // 极快 scale punch(从 1.22 冲到 1,~4-6 帧)+ 轻 overshoot。适配 0.3-0.6s(9-18 帧)。
+  const punch = punchIn({ frame, fps, delay: 1, amount: 0.22 });
+  // 砸入后**持续**极轻 scale(让 0.5s 内也不静止)。
+  const t = shotProgress(frame, durationInFrames);
+  const hold = driftScale(t, 1.0, 1.04);
+  const textScale = punch.scale * hold;
+  const textOpacity = punch.opacity;
+  // 满色帧的字要够大才算「重音」:短词放大占屏(再放大一档);按字数收敛防溢出。
   const wordLen = label.replace(/\s+/g, "").length;
-  const punchSize = Math.round(size.hero * (wordLen <= 8 ? 1.45 : wordLen <= 14 ? 1.05 : 0.8));
+  const punchSize = Math.round(size.hero * (wordLen <= 8 ? 1.6 : wordLen <= 14 ? 1.15 : 0.86));
 
   return (
-    <AbsoluteFill style={{ backgroundColor: fill, transform: `scale(${punchScale})`, transformOrigin: "center" }}>
+    <AbsoluteFill style={{ backgroundColor: fill }}>
       {label ? (
         <AbsoluteFill
           style={{
@@ -73,25 +74,25 @@ export default function PunchFrame({ scene = {}, theme, safeArea, captionsReserv
             justifyContent: "center",
           }}
         >
-          <div style={{ overflow: "hidden" }}>
-            <div
-              style={{
-                clipPath: `inset(${reveal}% 0% 0% 0%)`,
-                transform: `translateY(${textY}px)`,
-                ...GLOBAL_TEXT_STYLE,
-                fontFamily: fonts.display,
-                fontWeight: DISPLAY_WEIGHT,
-                fontSize: punchSize,
-                lineHeight: 0.98,
-                letterSpacing: DISPLAY_TRACKING,
-                color: fg,
-                textAlign: "center",
-                textWrap: "balance",
-                maxWidth: "100%",
-              }}
-            >
-              {label}
-            </div>
+          <div
+            style={{
+              transform: `scale(${textScale})`,
+              transformOrigin: "center center",
+              opacity: textOpacity,
+              willChange: "transform",
+              ...GLOBAL_TEXT_STYLE,
+              fontFamily: fonts.display,
+              fontWeight: DISPLAY_WEIGHT,
+              fontSize: punchSize,
+              lineHeight: 0.96,
+              letterSpacing: DISPLAY_TRACKING,
+              color: fg,
+              textAlign: "center",
+              textWrap: "balance",
+              maxWidth: "100%",
+            }}
+          >
+            {label}
           </div>
         </AbsoluteFill>
       ) : null}

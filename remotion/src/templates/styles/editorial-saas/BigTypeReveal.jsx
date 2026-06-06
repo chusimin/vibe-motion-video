@@ -1,12 +1,16 @@
 // BigTypeReveal —— 覆盖 title。editorial-saas 的开场招牌:
-// 满屏巨字、左对齐可切边(出血)、负字距 800、逐行遮罩揭示(clip-path + spring),
-// 亮底近黑字,关键词可染强调色;可选小标签在上方(对应 ObiN「Founder / Obin Studio」式 eyebrow)。
+// 满屏巨字、左对齐可切边(出血)、负字距 800、逐行**快**砸入(snap overshoot ~6-9 帧到位),
+// 之后**全程**缓慢横扫 + scale drift(永不静止),亮底近黑字,关键词可染强调色。
+// 对标 ObiN「orph.network」满屏出血、字一直在涨/横移。
 //
 // props 与 _base/Title.jsx 同款:{ scene, theme, safeArea, captionsReserve, justify }
 import React from "react";
 import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
 import { GLOBAL_TEXT_STYLE } from "../../../fonts.js";
-import { DISPLAY_TRACKING, DISPLAY_WEIGHT, splitEmphasis, maskReveal, smoothSpring } from "./_shared.jsx";
+import {
+  DISPLAY_TRACKING, DISPLAY_WEIGHT, splitEmphasis, maskReveal,
+  snapSpring, shotProgress, driftScale, driftXY,
+} from "./_shared.jsx";
 
 // 把标题切成「视觉行」:优先用显式换行;否则按词数粗分，让巨字占满高度而非缩成一行。
 function toLines(text) {
@@ -24,29 +28,34 @@ function toLines(text) {
 
 export default function BigTypeReveal({ scene = {}, theme, safeArea, captionsReserve = 0 }) {
   const frame = useCurrentFrame();
-  const { fps } = useVideoConfig();
-  const { motion, size, fonts, palette, accent } = theme;
+  const { fps, durationInFrames } = useVideoConfig();
+  const { size, fonts, palette, accent } = theme;
 
   const title = scene.onScreenText || scene.visual?.value || scene.purpose || "";
   const eyebrow = scene.visual?.subtitle || scene.visual?.eyebrow || "";
   const lines = toLines(title);
 
-  // 巨字:吃满高度,逼近出血。竖屏一行字宽可超出安全区左右(切边),用负 margin 让左缘咬住画面边。
-  // 字号取 hero 再放大;按行数收敛防溢出。
+  // 巨字:吃满高度,逼近出血。字号再放大(比原来 +~12%),短词更狠,允许切边。
   const lineCount = Math.max(1, lines.length);
-  const fontSize = Math.round(size.hero * (lineCount >= 3 ? 0.92 : 1.12));
+  const fontSize = Math.round(size.hero * (lineCount >= 3 ? 1.04 : 1.28));
 
   const top = safeArea.top ?? 60;
   const left = safeArea.left ?? 60;
   const right = safeArea.right ?? 60;
   const bottom = (safeArea.bottom ?? 60) + captionsReserve;
 
-  // eyebrow 入场
-  const ebS = smoothSpring({ frame, fps, delay: 2, motion });
-  const ebOpacity = interpolateClamp(ebS, 0, 1);
+  // 镜头进度:驱动全程不静止的横扫 + scale drift。
+  const t = shotProgress(frame, durationInFrames);
+  // 整块持续:scale 1.0→1.07 缓推 + 缓慢左移横扫(像镜头慢慢扫过巨字),竖向极轻浮动。
+  const blockScale = driftScale(t, 1.0, 1.07);
+  const sweep = driftXY(t, { creepX: -fontSize * 0.16, ampY: fontSize * 0.012, loops: 1 });
+
+  // eyebrow 快入场(snap)。
+  const ebS = snapSpring({ frame, fps, delay: 1 });
+  const ebOpacity = clamp01(ebS);
 
   return (
-    <AbsoluteFill style={{ backgroundColor: palette.bg }}>
+    <AbsoluteFill style={{ backgroundColor: palette.bg, overflow: "hidden" }}>
       <AbsoluteFill
         style={{
           paddingTop: top,
@@ -58,13 +67,17 @@ export default function BigTypeReveal({ scene = {}, theme, safeArea, captionsRes
           flexDirection: "column",
           justifyContent: "center",
           alignItems: "flex-start",
+          // 整块持续运动:横扫 + 推进。transformOrigin 左中,保证向左出血而非缩小。
+          transform: `translate(${sweep.x}px, ${sweep.y}px) scale(${blockScale})`,
+          transformOrigin: "0% 50%",
+          willChange: "transform",
         }}
       >
         {eyebrow ? (
           <div
             style={{
               opacity: ebOpacity,
-              transform: `translateY(${(1 - ebS) * 12}px)`,
+              transform: `translateY(${(1 - ebS) * 16}px)`,
               ...GLOBAL_TEXT_STYLE,
               fontFamily: fonts.body,
               fontWeight: 600,
@@ -72,7 +85,7 @@ export default function BigTypeReveal({ scene = {}, theme, safeArea, captionsRes
               letterSpacing: "0.16em",
               textTransform: "uppercase",
               color: accent(0),
-              marginBottom: Math.round(fontSize * 0.18),
+              marginBottom: Math.round(fontSize * 0.16),
               marginLeft: Math.round(left * 0.5),
             }}
           >
@@ -81,9 +94,11 @@ export default function BigTypeReveal({ scene = {}, theme, safeArea, captionsRes
         ) : null}
 
         {lines.map((line, li) => {
-          // 逐行错峰揭示:每行晚 ~5 帧,平滑 spring 驱动遮罩升出。
-          const s = smoothSpring({ frame, fps, delay: 4 + li * 5, motion });
+          // 逐行**快**砸入:每行只晚 ~3 帧,snap overshoot(~6-9 帧到位),遮罩升出。
+          const s = snapSpring({ frame, fps, delay: 2 + li * 3 });
           const reveal = maskReveal(s);
+          // 每行额外的细微独立呼吸(行间错相,避免整块一坨):极轻字距脉动。
+          const lineTrack = -0.03 + 0.006 * Math.sin(t * Math.PI * 2 + li * 1.3);
           const parts = splitEmphasis(line);
           return (
             <div
@@ -100,8 +115,8 @@ export default function BigTypeReveal({ scene = {}, theme, safeArea, captionsRes
                   fontFamily: fonts.display,
                   fontWeight: DISPLAY_WEIGHT,
                   fontSize,
-                  lineHeight: 1.0,
-                  letterSpacing: DISPLAY_TRACKING,
+                  lineHeight: 0.98,
+                  letterSpacing: `${lineTrack}em`,
                   color: palette.fg,
                   whiteSpace: "nowrap", // 巨字不换行 → 真切边出血
                 }}
@@ -122,6 +137,6 @@ export default function BigTypeReveal({ scene = {}, theme, safeArea, captionsRes
   );
 }
 
-function interpolateClamp(v, a, b) {
-  return Math.max(a, Math.min(b, v));
+function clamp01(v) {
+  return Math.max(0, Math.min(1, v));
 }

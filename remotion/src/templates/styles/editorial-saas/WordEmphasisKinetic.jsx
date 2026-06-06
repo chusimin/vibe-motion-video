@@ -1,27 +1,31 @@
 // WordEmphasisKinetic —— 覆盖 kinetic-text。editorial-saas 的铺陈招牌:
-// 整句中性色,**唯一关键词**(显式 **包裹** 或末位实义词)换 accent + 轻微 scale pop。
-// 对标 ObiN「Built around You, instead of us」「a story of experimentation」——
-// 一帧一个焦点,克制到只有一个词在动/换色,其余整句静中性。
+// 词**快速逐个砸入**(snap overshoot,每词差 ~2 帧),**唯一关键词**额外 scale punch + 全程微跳;
+// 整块持续极轻缩放/浮动,镜头内永不静止。字更大(h2 放大)。
+// 对标 ObiN「Built around You, instead of us」——一帧一个焦点,但每帧都在动。
 //
 // props 与 _base/KineticText.jsx 同款:{ scene, theme, safeArea, captionsReserve, justify }
 import React from "react";
 import { useCurrentFrame, useVideoConfig } from "remotion";
 import { SafeFrame } from "../../../lib/anim.jsx";
 import { GLOBAL_TEXT_STYLE } from "../../../fonts.js";
-import { splitEmphasis, smoothSpring } from "./_shared.jsx";
+import { splitEmphasis, snapSpring, shotProgress, driftScale } from "./_shared.jsx";
 
 export default function WordEmphasisKinetic({ scene = {}, theme, safeArea, captionsReserve = 0, justify = "center" }) {
   const frame = useCurrentFrame();
-  const { fps } = useVideoConfig();
-  const { motion, size, fonts, palette, accent, layout } = theme;
+  const { fps, durationInFrames } = useVideoConfig();
+  const { size, fonts, palette, accent, layout } = theme;
 
   const text = scene.onScreenText || scene.vo || scene.purpose || "";
   const parts = splitEmphasis(text);
-  const maxW = layout?.maxContentWidth || "92%";
+  const maxW = layout?.maxContentWidth || "94%";
 
-  // 整句作为一个排版块:中性、中等大字(h2 量级,比巨字小,留白靠居中),逐词极轻错峰浮现。
-  // 关键词晚一点单独 pop(scale 1.0→稍大),抓住唯一焦点。
-  const emphasisIdx = parts.findIndex((p) => p.accent);
+  // 整句字号再放大(比原 h2 大 ~22%),少字时更冲。关键词额外更大。
+  const wordSize = Math.round(size.h2 * 1.22);
+
+  // 镜头进度:整块持续运动(永不静止)。
+  const t = shotProgress(frame, durationInFrames);
+  const blockScale = driftScale(t, 1.0, 1.05); // 整块缓推
+  const blockY = Math.sin(t * Math.PI * 2) * (wordSize * 0.02); // 极轻整块浮动
 
   return (
     <SafeFrame safeArea={safeArea} extraBottom={captionsReserve} justify={justify}>
@@ -31,22 +35,27 @@ export default function WordEmphasisKinetic({ scene = {}, theme, safeArea, capti
           flexWrap: "wrap",
           justifyContent: "center",
           alignItems: "baseline",
-          gap: `${size.h2 * 0.12}px ${size.h2 * 0.26}px`,
+          gap: `${wordSize * 0.1}px ${wordSize * 0.22}px`,
           maxWidth: maxW,
+          transform: `translateY(${blockY}px) scale(${blockScale})`,
+          transformOrigin: "center center",
+          willChange: "transform",
         }}
       >
         {parts.map((p, i) => {
-          // 词逐个浮现(很轻):整句先后差 ~2 帧;关键词额外延迟做独立 pop。
-          const base = smoothSpring({ frame, fps, delay: 3 + i * 2, motion });
-          const opacity = clamp01(base);
-          const y = (1 - base) * (size.h2 * 0.14);
+          // 词**快速逐个砸入**:每词差 ~2 帧,snap overshoot(~6 帧到位),从下方冲入。
+          const base = snapSpring({ frame, fps, delay: 1 + i * 2 });
+          const opacity = clamp01(base * 1.4);
+          const y = (1 - clamp01(base)) * (wordSize * 0.3);
 
-          // 关键词:在整句落定后再做一次干净的 scale pop（从 0.86 弹到 1）。
+          // 关键词:落定后额外 scale punch(snap 越过 1)+ 全程微跳(永不静止)。
           let scale = 1;
           let color = palette.fg;
           if (p.accent) {
-            const pop = smoothSpring({ frame, fps, delay: 3 + parts.length * 2 + 3, motion: { ...motion, overshoot: true } });
-            scale = 0.86 + 0.14 * clamp01(pop);
+            const pop = snapSpring({ frame, fps, delay: 2 + parts.length * 2 });
+            // pop 会越过 1(overshoot),直接当 scale → 砸进来时冲到 ~1.1 再收。
+            const bob = 1 + 0.03 * Math.sin(t * Math.PI * 2 * 2); // 持续微跳
+            scale = (0.7 + 0.3 * pop) * bob;
             color = accent(0);
           }
 
@@ -61,9 +70,9 @@ export default function WordEmphasisKinetic({ scene = {}, theme, safeArea, capti
                 ...GLOBAL_TEXT_STYLE,
                 fontFamily: fonts.display,
                 fontWeight: p.accent ? 800 : 600,
-                fontSize: size.h2,
-                lineHeight: 1.12,
-                letterSpacing: "-0.01em",
+                fontSize: p.accent ? Math.round(wordSize * 1.12) : wordSize,
+                lineHeight: 1.08,
+                letterSpacing: "-0.02em",
                 color,
               }}
             >

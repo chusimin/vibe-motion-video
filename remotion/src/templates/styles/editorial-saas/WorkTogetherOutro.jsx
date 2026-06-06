@@ -9,7 +9,7 @@ import { useCurrentFrame, useVideoConfig } from "remotion";
 import { SafeFrame } from "../../../lib/anim.jsx";
 import { GLOBAL_TEXT_STYLE } from "../../../fonts.js";
 import { withAlpha } from "../../../theme.js";
-import { smoothSpring } from "./_shared.jsx";
+import { snapSpring, shotProgress, driftScale } from "./_shared.jsx";
 
 // 四角星 sparkle（CSS 凹四边形，呼应 ObiN 紫色四角星元素）。
 function Sparkle({ size, color, style }) {
@@ -30,30 +30,34 @@ function Sparkle({ size, color, style }) {
 
 export default function WorkTogetherOutro({ scene = {}, theme, safeArea, captionsReserve = 0, justify = "center" }) {
   const frame = useCurrentFrame();
-  const { fps } = useVideoConfig();
-  const { motion, size, fonts, palette, accent } = theme;
+  const { fps, durationInFrames } = useVideoConfig();
+  const { size, fonts, palette, accent } = theme;
   const v = scene.visual || {};
   const headline = scene.onScreenText || "Let's Work Together";
   const sub = v.value || v.action || v.url || "";
 
-  // pill 入场：轻 scale + 升入。
-  const pillS = smoothSpring({ frame, fps, delay: 4, motion: { ...motion, overshoot: true } });
-  const pillScale = 0.9 + 0.1 * clamp01(pillS);
-  const pillOpacity = clamp01(pillS * 1.4);
+  // pill **快**入场:snap overshoot(~6-8 帧到位,冲过 1 再收)。
+  const pillS = snapSpring({ frame, fps, delay: 2 });
+  const t = shotProgress(frame, durationInFrames);
+  // 入场冲过 1,之后持续呼吸 + 极轻浮动(永不静止,比之前更明显一档)。
+  const pillBreathe = 1 + 0.045 * Math.sin(t * Math.PI * 2 * 1.3);
+  const pillScale = (0.82 + 0.18 * pillS) * pillBreathe;
+  const pillFloatY = Math.sin(t * Math.PI * 2 * 0.9) * (size.h2 * 0.06); // 整块缓慢上下浮
+  const pillOpacity = clamp01(pillS * 1.6);
 
-  // 副行更晚、更弱。
-  const subS = smoothSpring({ frame, fps, delay: 18, motion });
+  // 副行更快出、仍更弱。
+  const subS = snapSpring({ frame, fps, delay: 8 });
 
-  // sparkle 轻微自转 + 呼吸。
-  const spin = (frame / fps) * 40; // 慢转
-  const breathe = 1 + 0.08 * Math.sin((frame / fps) * Math.PI * 2 * 0.5);
+  // sparkle 持续自转(更快)+ 呼吸(永不静止)。
+  const spin = (frame / fps) * 90; // 持续快转
+  const breathe = 1 + 0.16 * Math.sin((frame / fps) * Math.PI * 2 * 0.9);
 
   const pillPadV = Math.round(size.h3 * 0.62);
   const pillPadH = Math.round(size.h1 * 0.5);
 
   return (
     <SafeFrame safeArea={safeArea} extraBottom={captionsReserve} justify={justify}>
-      <div style={{ position: "relative", display: "flex", flexDirection: "column", alignItems: "center" }}>
+      <div style={{ position: "relative", display: "flex", flexDirection: "column", alignItems: "center", transform: `translateY(${pillFloatY}px)`, willChange: "transform" }}>
         {/* 描边 pill */}
         <div
           style={{

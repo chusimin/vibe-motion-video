@@ -7,7 +7,7 @@ import React from "react";
 import { useCurrentFrame, useVideoConfig, spring } from "remotion";
 import { SafeFrame } from "../../../lib/anim.jsx";
 import { GLOBAL_TEXT_STYLE } from "../../../fonts.js";
-import { DISPLAY_TRACKING, smoothSpring } from "./_shared.jsx";
+import { DISPLAY_TRACKING, snapSpring, shotProgress, driftScale } from "./_shared.jsx";
 
 // 与 _base/Stat 同口径地拆「前缀/数字/后缀」。
 function parseValue(raw) {
@@ -32,23 +32,28 @@ function formatNum(n, decimals, hasComma) {
 
 export default function EditorialStat({ scene = {}, theme, safeArea, captionsReserve = 0, justify = "center" }) {
   const frame = useCurrentFrame();
-  const { fps, width } = useVideoConfig();
-  const { motion, size, fonts, palette, accent } = theme;
+  const { fps, width, durationInFrames } = useVideoConfig();
+  const { size, fonts, palette, accent } = theme;
   const v = scene.visual || {};
   const { prefix, num, suffix, decimals, hasComma } = parseValue(v.value);
   const label = scene.onScreenText || v.label || "";
 
-  // 数字滚动:平滑 spring 0→num，约 1.1s。
-  const roll = spring({ frame: frame - 4, fps, config: { damping: 32, mass: 1, stiffness: 80 } });
+  // 数字**快速**滚动到位:脆 spring 0→num,约 0.4-0.5s 冲满(适配短镜)。
+  const roll = clamp01(spring({ frame: frame - 2, fps, config: { damping: 20, mass: 0.6, stiffness: 200 } }));
   const display = num != null ? formatNum(num * roll, decimals, hasComma) : (v.value ?? "");
 
-  // 巨数字入场:遮罩升出 + 轻 scale。
-  const numS = smoothSpring({ frame, fps, delay: 3, motion });
-  const numY = (1 - numS) * (size.statNumber * 0.1);
-  const numOpacity = clamp01(numS * 1.3);
+  // 巨数字**快**砸入:snap overshoot(~6 帧到位),从下方升 + 冲过 1 再收。
+  const numS = snapSpring({ frame, fps, delay: 1 });
+  const numY = (1 - clamp01(numS)) * (size.statNumber * 0.14);
+  const numOpacity = clamp01(numS * 1.6);
 
-  // 极小标签:晚出，弱化、字距拉开，editorial 标签味。
-  const labS = smoothSpring({ frame, fps, delay: 20, motion });
+  // 镜头进度:数字落定后**持续**极轻 scale + 微浮(永不静止)。
+  const t = shotProgress(frame, durationInFrames);
+  const numDrift = driftScale(t, 1.0, 1.08);
+  const numFloat = Math.sin(t * Math.PI * 2 * 1.1) * (size.statNumber * 0.012);
+
+  // 极小标签:快出(比原来早很多),弱化、字距拉开,editorial 标签味。
+  const labS = snapSpring({ frame, fps, delay: 6 });
 
   // 数字字号：要狠(独占画面)，但**整串必须完整可读**(对标 ObiN「200,000」全显，不切首位)。
   // 按最终串字符数估算宽度(等宽数字 ~0.6em，逗号/小数点 ~0.3em)，把字号收敛到 ≤ 安全区宽度。
@@ -64,8 +69,10 @@ export default function EditorialStat({ scene = {}, theme, safeArea, captionsRes
       <div style={{ overflow: "hidden" }}>
         <div
           style={{
-            transform: `translateY(${numY}px)`,
+            transform: `translateY(${numY + numFloat}px) scale(${numDrift})`,
+            transformOrigin: "center center",
             opacity: numOpacity,
+            willChange: "transform",
             ...GLOBAL_TEXT_STYLE,
             fontFamily: fonts.display,
             fontWeight: 800,

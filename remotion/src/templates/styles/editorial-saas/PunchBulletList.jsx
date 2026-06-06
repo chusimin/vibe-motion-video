@@ -8,20 +8,24 @@ import React from "react";
 import { useCurrentFrame, useVideoConfig } from "remotion";
 import { SafeFrame } from "../../../lib/anim.jsx";
 import { GLOBAL_TEXT_STYLE } from "../../../fonts.js";
-import { DISPLAY_TRACKING, DISPLAY_WEIGHT, smoothSpring, maskReveal } from "./_shared.jsx";
+import { DISPLAY_TRACKING, DISPLAY_WEIGHT, snapSpring, maskReveal, shotProgress, driftXY } from "./_shared.jsx";
 
 export default function PunchBulletList({ scene = {}, theme, safeArea, captionsReserve = 0, justify = "center" }) {
   const frame = useCurrentFrame();
-  const { fps } = useVideoConfig();
-  const { motion, size, fonts, palette, accent } = theme;
+  const { fps, durationInFrames } = useVideoConfig();
+  const { size, fonts, palette, accent } = theme;
   const heading = scene.onScreenText || "";
   const items = Array.isArray(scene.visual?.items) ? scene.visual.items : [];
 
-  // 小标题作 eyebrow（极小、强调色、大写字距）——editorial 的「分区标签」处理。
-  const headS = smoothSpring({ frame, fps, delay: 2, motion });
+  // 小标题作 eyebrow（极小、强调色、大写字距）——快入场。
+  const headS = snapSpring({ frame, fps, delay: 1 });
 
-  // 条目大字（h2 量级），逐行遮罩升出，行间留白足。
-  const itemSize = Math.round(size.h2 * 0.92);
+  // 条目大字（h2 量级，再放大一点），逐行遮罩升出，行间留白足。
+  const itemSize = Math.round(size.h2 * 1.0);
+
+  // 镜头进度:整块持续极轻横向漂(永不静止)。
+  const t = shotProgress(frame, durationInFrames);
+  const blockDrift = driftXY(t, { ampX: itemSize * 0.04, ampY: itemSize * 0.02, loops: 1, creepX: itemSize * 0.05 });
 
   return (
     <SafeFrame safeArea={safeArea} align="flex-start" justify={justify} extraBottom={captionsReserve}>
@@ -44,20 +48,28 @@ export default function PunchBulletList({ scene = {}, theme, safeArea, captionsR
         </div>
       ) : null}
 
-      <div style={{ display: "flex", flexDirection: "column", gap: Math.round(itemSize * 0.42), width: "100%" }}>
+      <div
+        style={{
+          display: "flex", flexDirection: "column", gap: Math.round(itemSize * 0.42), width: "100%",
+          transform: `translate(${blockDrift.x}px, ${blockDrift.y}px)`,
+          willChange: "transform",
+        }}
+      >
         {items.map((it, i) => {
-          // 逐条错峰：每条晚 ~6 帧，遮罩升出。
-          const s = smoothSpring({ frame, fps, delay: 8 + i * 6, motion });
+          // 逐条**极快**错峰砸入:每条只晚 2-3 帧,snap overshoot(~6 帧到位),遮罩升出。
+          const s = snapSpring({ frame, fps, delay: 3 + i * 3 });
           const reveal = maskReveal(s);
+          // 标记竖条:落定后持续极轻竖向脉动(永不静止),错相避免整齐划一。
+          const barPulse = 0.86 + 0.06 * Math.sin(t * Math.PI * 2 * 2 + i * 0.9);
           return (
             <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: Math.round(itemSize * 0.34), overflow: "hidden" }}>
-              {/* accent 标记：细长竖条（非圆点），更 editorial、更克制 */}
+              {/* accent 标记：细长竖条（非圆点），更 editorial；全程轻脉动 */}
               <div
                 style={{
                   ...reveal,
                   flex: "0 0 auto",
                   width: Math.max(5, Math.round(itemSize * 0.07)),
-                  height: `${itemSize * 0.86}px`,
+                  height: `${itemSize * barPulse}px`,
                   marginTop: Math.round(itemSize * 0.1),
                   borderRadius: 999,
                   background: accent(0),
