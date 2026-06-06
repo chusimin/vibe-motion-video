@@ -78,6 +78,16 @@ vibe-projects/<slug>/
 **循环:** 渲一段 → 打开给用户看 → 用户确认 OK 才渲下一段;有问题则 agent 改 storyboard 对应 scene → `vibemotion render --chunk N --force` 只重渲这一段。全部 `chunks[].status=approved` 才进⑦。
 > 🎯 **每段对照 [docs/showreel-craft.md](./docs/showreel-craft.md) 的反 slop 清单自审**:无 emoji 图标/无俗气渐变/无霓虹乱发光/只用真实色板/标题够大够紧/前 3 秒抓人/关键信息有字幕。审美由用户把关,每段先给图再迭代。
 
+## 步骤⑦· BGM(showreel 用,assemble 前)
+
+showreel 这类有配乐的片,在 assemble 前先备好 BGM 并(可选)卡点:
+1. **出词:** `vibemotion music prompt [--variant A|B|C] [--bpm N]` —— 按 `presets/audio/<类型>.json`(缺则 showreel)填模板,出**可直接投喂 Suno/Udio 的正/负向提示词** + 推荐模型 + 当前 BPM/时长 + 卡点提示,并写 `05_assets/music/bgm-prompt.txt`。
+2. **生成:** 拿提示词去 **Suno / Udio**(或 ElevenLabs Music / Stable Audio)生成 BGM,放进 `05_assets/music/`。
+3. **登记:** `vibemotion music set 05_assets/music/<曲>.mp3 [--gain -20] [--duck]` —— 写 `storyboard.music{track,gainDb,duckUnderVo}`,assemble 据此混音。
+4. **(可选)卡点:** `vibemotion music sync --bpm <同 prompt 的值> [--offset S]` 先看各 scene 边界对最近拍点的偏移;`--apply` 把每个 scene 时长吸到整数拍(切点落拍)→ **改了时间轴必须复跑 `storyboard validate` + `storyboard plan` 重切分段**。BPM 拿不准可 `--detect <曲>` 粗估兜底(标注近似,不准就手填)。
+
+> 配乐由 `vibemotion music set` 写进 `storyboard.music` 后,⑦ assemble 会自动 **ducking(人声出现压低 BGM)+ 响度归一 -14 LUFS**;无人声时 BGM 直接铺。
+
 ## 步骤⑦  自动合成 + 体检
 
 **命令:** `vibemotion assemble`(ffmpeg 拼接已批准分段 + 混音/配乐 ducking + 响度归一 -14LUFS + 字幕)→ `vibemotion qa`(ffprobe 抽帧检查:总时长、音画同步、字幕安全区、无溢出/错帧)。

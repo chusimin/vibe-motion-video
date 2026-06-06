@@ -35,6 +35,7 @@ const ROUTES = {
   storyboard: "storyboard/index.mjs",
   assets: "assets/index.mjs",
   voice: "voice/index.mjs",
+  music: "music/index.mjs",
   render: "render/index.mjs",
   assemble: "assemble/index.mjs",
   qa: "assemble/qa.mjs",
@@ -98,6 +99,7 @@ vibemotion —— 内容→视频 自动化流水线
   storyboard [validate|plan]④ 分镜 IR + 15s 分段
   assets [--scene <id>]     ④· 素材闸门:自动绑定 ingest 抓的 + 缺口清单 + ffprobe 校验
   voice <list|synth|...>    ⑤ TTS 配音 + 字幕对齐
+  music <prompt|sync|set>   ⑦· showreel 配乐:出 BGM 提示词 / 按 BPM 卡点 / 登记配乐
   render --chunk N | --all  ⑥ 分段渲染
   assemble                  ⑦ 合成 + QA
   qa                        ⑦ 单独体检
