@@ -1,0 +1,13 @@
+{
+  "id": "youtube",
+  "label": "YouTube 横屏",
+  "aspectRatio": "16:9",
+  "resolution": { "width": 1920, "height": 1080 },
+  "fps": 30,
+  "durationRange": [30, 600],
+  "hookSec": 5,
+  "safeArea": { "top": 60, "bottom": 90, "left": 90, "right": 90 },
+  "captions": { "style": "line", "burnIn": false, "maxCharsPerLine": 42 },
+  "loudnessLUFS": -14,
+  "notes": "横屏长内容,前 5 秒交代价值;下方留 90px 给进度条/播放器 UI;默认软字幕(平台支持 CC),单行长句。"
+}

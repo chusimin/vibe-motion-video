@@ -1,0 +1,29 @@
+{
+  "name": "vibe-motion-video",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "内容 → 视频 自动化流水线(Remotion 渲染),Claude Code / Codex 通用 skill",
+  "bin": {
+    "vibemotion": "bin/vibemotion.mjs"
+  },
+  "scripts": {
+    "cli": "node bin/vibemotion.mjs",
+    "remotion:studio": "remotion studio remotion/src/index.jsx",
+    "test": "node --test test/"
+  },
+  "dependencies": {
+    "@remotion/bundler": "^4.0.472",
+    "@remotion/captions": "^4.0.472",
+    "@remotion/cli": "^4.0.472",
+    "@remotion/renderer": "^4.0.472",
+    "@remotion/transitions": "^4.0.472",
+    "ajv": "^8.20.0",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
+    "remotion": "^4.0.472"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

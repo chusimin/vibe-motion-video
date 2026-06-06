@@ -1,0 +1,14 @@
+{
+  "id": "bento",
+  "label": "Bento 便当格(暖色 · 卡片分区)",
+  "palette": {
+    "bg": "#FFF7ED",
+    "fg": "#1C1917",
+    "accent": ["#F97316", "#FACC15", "#10B981", "#EC4899"]
+  },
+  "fonts": {
+    "display": "\"Plus Jakarta Sans\", \"PingFang SC\", \"Helvetica Neue\", Arial, sans-serif",
+    "body": "Inter, \"PingFang SC\", \"Helvetica Neue\", Arial, sans-serif"
+  },
+  "motion": "balanced"
+}

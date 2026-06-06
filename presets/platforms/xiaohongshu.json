@@ -1,0 +1,13 @@
+{
+  "id": "xiaohongshu",
+  "label": "小红书 竖版 4:5",
+  "aspectRatio": "4:5",
+  "resolution": { "width": 1080, "height": 1350 },
+  "fps": 30,
+  "durationRange": [10, 300],
+  "hookSec": 3,
+  "safeArea": { "top": 100, "bottom": 180, "left": 60, "right": 60 },
+  "captions": { "style": "block", "burnIn": true, "maxCharsPerLine": 16 },
+  "loudnessLUFS": -14,
+  "notes": "笔记感 4:5 竖版(小红书标准推荐比例,封面友好;config schema 仅支持 4:5/9:16,故用 4:5);标题党首图 + 干净留白;硬字幕块状、暖色调;前 3 秒给结论。"
+}

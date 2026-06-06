@@ -1,0 +1,47 @@
+{
+  "id": "knowledge-explainer",
+  "outputType": "knowledge-explainer",
+  "label": "知识讲解(问题→概念→例子→小结)",
+  "description": "把一个概念/原理讲明白的解释型视频。经典讲解结构:抛问题制造好奇 → 给出概念 → 用例子落地 → 小结收束并升华。重逻辑、重清晰,适合教学/科普。",
+  "defaultDurationSec": 60,
+  "firstSceneSec": 5,
+  "beats": [
+    {
+      "role": "question",
+      "purpose": "抛出一个让人想知道答案的问题或反常识现象,制造好奇缺口,给出本期要解答的承诺。",
+      "suggestedSec": 6,
+      "visualHint": "kinetic-text"
+    },
+    {
+      "role": "context",
+      "purpose": "(可选)交代背景/为什么这个问题重要,让听众有接住概念的前提。",
+      "suggestedSec": 6,
+      "visualHint": "title"
+    },
+    {
+      "role": "concept",
+      "purpose": "给出核心概念/定义/原理:一句话讲清,再拆成 2-3 个要点,用图示或要点列表帮助理解。",
+      "suggestedSec": 16,
+      "visualHint": "bullet-list"
+    },
+    {
+      "role": "example",
+      "purpose": "用一个具体、贴近生活的例子把抽象概念落地,演示概念怎么运作,\"原来如此\"的顿悟点。",
+      "suggestedSec": 18,
+      "visualHint": "feature-reveal"
+    },
+    {
+      "role": "summary",
+      "purpose": "小结:一句话复述结论 + 关键要点回顾,可升华到\"所以这对你意味着什么\"。",
+      "suggestedSec": 9,
+      "visualHint": "kinetic-text"
+    },
+    {
+      "role": "cta",
+      "purpose": "引导互动/关注/下一集:留一个延伸问题或资源。",
+      "suggestedSec": 5,
+      "visualHint": "cta"
+    }
+  ],
+  "notes": "核心是\"问题→概念→例子→小结\"四拍闭环。concept 与 example 给足时长是讲清楚的关键;example 务必具体可感。context 可选,短片直接 question→concept。"
+}

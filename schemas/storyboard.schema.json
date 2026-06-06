@@ -1,0 +1,99 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "vibemotion/storyboard",
+  "title": "Storyboard",
+  "description": "渲染器无关的中间表示(IR)。步骤④的分镜骨架,帧级精确时间。Remotion 适配器消费它。",
+  "type": "object",
+  "required": ["concept", "fps", "resolution", "totalDurationSec", "scenes"],
+  "additionalProperties": false,
+  "properties": {
+    "concept": {
+      "type": "object",
+      "required": ["id", "hook", "angle"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string" },
+        "hook": { "type": "string", "description": "开场钩子" },
+        "angle": { "type": "string", "description": "叙事角度" },
+        "logline": { "type": "string" }
+      }
+    },
+    "fps": { "type": "integer", "enum": [24, 25, 30, 60] },
+    "resolution": {
+      "type": "object",
+      "required": ["width", "height"],
+      "properties": {
+        "width": { "type": "integer" },
+        "height": { "type": "integer" }
+      }
+    },
+    "totalDurationSec": { "type": "number", "minimum": 0 },
+    "scenes": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["id", "startSec", "durationSec", "purpose", "visual"],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "type": "string", "pattern": "^s[0-9]{2,}$", "description": "如 s01" },
+          "startSec": { "type": "number", "minimum": 0, "description": "起始时间(秒),精确到帧" },
+          "durationSec": { "type": "number", "minimum": 0.2, "description": "时长(秒)" },
+          "purpose": { "type": "string", "description": "这个 scene 的目的" },
+          "vo": { "type": "string", "description": "旁白/台词(配音文本)。无配音可空" },
+          "onScreenText": { "type": "string", "description": "屏幕主文字" },
+          "visual": {
+            "type": "object",
+            "required": ["type"],
+            "additionalProperties": true,
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": ["title", "feature-reveal", "product-capture", "kinetic-text", "bullet-list", "quote", "stat", "comparison", "cta", "lower-third", "bg-only"],
+                "description": "镜头视觉类型,对应 remotion/src/templates 下的组件"
+              },
+              "media": { "type": "string", "description": "图片/视频/录屏素材路径(相对 project)" },
+              "motion": { "type": "string", "description": "如 zoom-in / pan-left / ken-burns" },
+              "items": { "type": "array", "items": { "type": "string" }, "description": "bullet-list 用" },
+              "value": { "type": "string", "description": "stat 用的大数字" },
+              "callouts": { "type": "array", "items": { "type": "object" }, "description": "product-capture 的标注" }
+            }
+          },
+          "bg": { "type": "string", "description": "背景:颜色 / 渐变名 / 素材" },
+          "transitionIn": { "type": "string", "enum": ["none", "fade", "wipe-left", "wipe-right", "slide-up", "scale", "clock"], "default": "fade" },
+          "transitionOut": { "type": "string", "enum": ["none", "fade", "wipe-left", "wipe-right", "slide-up", "scale", "clock"], "default": "none" },
+          "sfx": { "type": "string" },
+          "captionsRef": { "type": "string", "description": "指向 05_assets/captions/<sceneId>.json 的词级时间戳" },
+          "audioRef": { "type": "string", "description": "指向 05_assets/audio/<sceneId>.<ext> 的配音文件" }
+        }
+      }
+    },
+    "chunks": {
+      "type": "array",
+      "description": "步骤⑥:按 chunkSec(默认15s)切的分段,逐段渲染确认",
+      "items": {
+        "type": "object",
+        "required": ["index", "sceneIds", "startSec", "durationSec", "status"],
+        "additionalProperties": false,
+        "properties": {
+          "index": { "type": "integer", "minimum": 0 },
+          "sceneIds": { "type": "array", "items": { "type": "string" } },
+          "startSec": { "type": "number" },
+          "durationSec": { "type": "number" },
+          "status": { "type": "string", "enum": ["pending", "rendered", "approved", "rejected"], "default": "pending" },
+          "renderRef": { "type": "string", "description": "渲染产物 06_renders/chunk-<index>.mp4" },
+          "note": { "type": "string", "description": "用户反馈" }
+        }
+      }
+    },
+    "music": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "track": { "type": "string" },
+        "gainDb": { "type": "number", "default": -18 },
+        "duckUnderVo": { "type": "boolean", "default": true }
+      }
+    }
+  }
+}

@@ -1,0 +1,71 @@
+{
+  "id": "showreel",
+  "outputType": "showreel",
+  "label": "产品 Showreel(功能集锦)",
+  "description": "为一个产品/工具做的高密度功能集锦片。开场 3 秒钩子抓眼,产品登场,逐个功能亮点快剪,数据/效果做背书,落 CTA。节奏偏快、视觉为主、台词精炼。",
+  "defaultDurationSec": 30,
+  "firstSceneSec": 3,
+  "beats": [
+    {
+      "role": "hook",
+      "purpose": "0-3s 用最炸的一帧/一句抓住眼球:抛出产品能解决的爽点或最惊艳的成品效果,让人停下划动的手。",
+      "suggestedSec": 3,
+      "visualHint": "kinetic-text"
+    },
+    {
+      "role": "problem",
+      "purpose": "(可选)点出目标用户当前的痛点/低效场景,制造\"这说的就是我\"的共鸣,为产品登场铺垫。短内容可省略。",
+      "suggestedSec": 3,
+      "visualHint": "kinetic-text"
+    },
+    {
+      "role": "solution",
+      "purpose": "产品正式登场:打出产品名 + 一句话定位(它是什么、为谁解决什么),配 logo/主界面亮相。",
+      "suggestedSec": 3,
+      "visualHint": "title"
+    },
+    {
+      "role": "feature",
+      "purpose": "核心功能亮点 ①:一个功能一个镜头,录屏/界面捕获展示真实操作,配标注与一句卖点。",
+      "suggestedSec": 4,
+      "visualHint": "product-capture"
+    },
+    {
+      "role": "feature",
+      "purpose": "核心功能亮点 ②:第二个差异化功能,feature-reveal 动效逐项展开,强调\"快/简单/效果好\"。",
+      "suggestedSec": 4,
+      "visualHint": "feature-reveal"
+    },
+    {
+      "role": "feature",
+      "purpose": "核心功能亮点 ③:第三个功能或一组小功能快剪,保持节奏密度;3-5 个功能按时长取舍。",
+      "suggestedSec": 4,
+      "visualHint": "product-capture"
+    },
+    {
+      "role": "proof",
+      "purpose": "用数据/效果对比做背书:用户数、节省时间、前后对比、好评等,大数字 + 一句佐证,建立可信度。",
+      "suggestedSec": 4,
+      "visualHint": "stat"
+    },
+    {
+      "role": "cta",
+      "purpose": "行动召唤:打出去哪用、怎么开始(网址/搜索词/二维码),配品牌色收尾定格。",
+      "suggestedSec": 3,
+      "visualHint": "cta"
+    }
+  ],
+  "emotionalArc": "痛 → 转 → 爽 → 燃(情绪要有曲线,别平铺直叙)",
+  "heroMode60s": {
+    "desc": "60s 英雄片结构(出自实战导演提示词,见 docs/showreel-craft.md)。工作流演示是重头戏。",
+    "beats": [
+      { "role": "hook", "sec": [3, 4], "purpose": "别划走的理由:痛点或最惊艳成品,3 秒内抓人" },
+      { "role": "登场", "sec": 8, "purpose": "痛点 → 产品登场,情绪从痛转到期待" },
+      { "role": "工作流演示", "sec": 22, "purpose": "★重头戏:把产品怎么用一步步演给人看(真实页面/录屏优先)" },
+      { "role": "规模化payoff", "sec": 12, "purpose": "爽点放大:批量/效果/规模感,把'爽'推到'燃'" },
+      { "role": "cta", "sec": 12, "purpose": "收尾召唤 + 品牌定格" }
+    ]
+  },
+  "realContentOnly": true,
+  "notes": "重点做\"功能亮点/工作流演示\"段:每个 feature 独立成镜,优先 product-capture(真实录屏)与 feature-reveal(逐项动效)。功能数按总时长伸缩:15s≈2-3 个、30s≈3-4 个、60s 用 heroMode60s 结构。problem 可选,时长紧张时砍掉直接 hook→solution。**做片前先读 docs/showreel-craft.md(情绪曲线+反 slop 清单+审美心法);只用真实产品的色板/文案/素材,禁止编造占位。**"
+}

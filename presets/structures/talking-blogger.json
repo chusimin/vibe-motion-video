@@ -1,0 +1,47 @@
+{
+  "id": "talking-blogger",
+  "outputType": "talking-blogger",
+  "label": "知识博主口播(观点输出节奏)",
+  "description": "以口播为主的博主风内容,核心是\"说\"。靠强观点钩子留人,亮明立场,给论据,落到可执行的干货,收尾引导互动。视觉服务于口播(字幕+要点+B-roll),节奏由语速驱动。",
+  "defaultDurationSec": 60,
+  "firstSceneSec": 4,
+  "beats": [
+    {
+      "role": "hook",
+      "purpose": "开口第一句就是钩子:抛强观点/争议/承诺(\"今天讲个反常识的……\"),让人不划走。配大字幕。",
+      "suggestedSec": 4,
+      "visualHint": "kinetic-text"
+    },
+    {
+      "role": "thesis",
+      "purpose": "亮明核心观点/结论:一句话立场 + 这期要给你什么(预告价值),建立信任。",
+      "suggestedSec": 6,
+      "visualHint": "lower-third"
+    },
+    {
+      "role": "point",
+      "purpose": "论点 ①:给出第一个理由/方法,配要点字幕与 B-roll 佐证,口播为主。",
+      "suggestedSec": 14,
+      "visualHint": "bullet-list"
+    },
+    {
+      "role": "point",
+      "purpose": "论点 ②:第二个理由/方法,可举身边例子或对比,保持口播节奏与信息密度。",
+      "suggestedSec": 14,
+      "visualHint": "bullet-list"
+    },
+    {
+      "role": "takeaway",
+      "purpose": "落到可执行:把观点收成一句能马上用的干货/行动建议,提升\"有用感\"。",
+      "suggestedSec": 12,
+      "visualHint": "kinetic-text"
+    },
+    {
+      "role": "cta",
+      "purpose": "引导互动:抛问题求评论、求关注/三连,预告下期。",
+      "suggestedSec": 6,
+      "visualHint": "cta"
+    }
+  ],
+  "notes": "口播驱动:时长与镜头分割跟着语速走,字幕必开且为视觉主体(karaoke/逐句)。point 数量按时长加减(短片 1-2 个,长片 3-4 个)。B-roll/要点辅助,别喧宾夺主。"
+}

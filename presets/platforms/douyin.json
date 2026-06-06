@@ -1,0 +1,13 @@
+{
+  "id": "douyin",
+  "label": "抖音 / TikTok 竖屏",
+  "aspectRatio": "9:16",
+  "resolution": { "width": 1080, "height": 1920 },
+  "fps": 30,
+  "durationRange": [15, 60],
+  "hookSec": 3,
+  "safeArea": { "top": 120, "bottom": 320, "left": 60, "right": 120 },
+  "captions": { "style": "karaoke", "burnIn": true, "maxCharsPerLine": 14 },
+  "loudnessLUFS": -14,
+  "notes": "前 3 秒必须有钩子;字幕大、放在安全区内(底部 320px 留给平台 UI);竖屏单主体构图。"
+}

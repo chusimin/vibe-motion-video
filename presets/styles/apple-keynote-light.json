@@ -1,0 +1,14 @@
+{
+  "id": "apple-keynote-light",
+  "label": "Apple Keynote(极简大字 · 浅色)",
+  "palette": {
+    "bg": "#FBFBFD",
+    "fg": "#1D1D1F",
+    "accent": ["#0071E3", "#34C759", "#FF2D55"]
+  },
+  "fonts": {
+    "display": "SF Pro Display, -apple-system, \"PingFang SC\", \"Helvetica Neue\", Arial, sans-serif",
+    "body": "SF Pro Text, -apple-system, \"PingFang SC\", \"Helvetica Neue\", Arial, sans-serif"
+  },
+  "motion": "calm"
+}

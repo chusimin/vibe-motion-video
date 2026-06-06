@@ -1,0 +1,13 @@
+{
+  "id": "tiktok",
+  "label": "TikTok 竖屏",
+  "aspectRatio": "9:16",
+  "resolution": { "width": 1080, "height": 1920 },
+  "fps": 30,
+  "durationRange": [15, 180],
+  "hookSec": 3,
+  "safeArea": { "top": 120, "bottom": 360, "left": 60, "right": 140 },
+  "captions": { "style": "karaoke", "burnIn": true, "maxCharsPerLine": 14 },
+  "loudnessLUFS": -14,
+  "notes": "前 3 秒强钩子;右侧/底部留给点赞与 caption 的平台 UI(右 140 / 底 360);英文短句字幕,逐词高亮。"
+}

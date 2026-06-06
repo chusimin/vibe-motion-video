@@ -1,0 +1,13 @@
+{
+  "id": "bilibili",
+  "label": "哔哩哔哩 横屏",
+  "aspectRatio": "16:9",
+  "resolution": { "width": 1920, "height": 1080 },
+  "fps": 30,
+  "durationRange": [30, 600],
+  "hookSec": 5,
+  "safeArea": { "top": 80, "bottom": 100, "left": 90, "right": 90 },
+  "captions": { "style": "block", "burnIn": true, "maxCharsPerLine": 28 },
+  "loudnessLUFS": -14,
+  "notes": "横屏中长视频;考虑弹幕飘屏,主体信息别贴顶;硬字幕居中偏下,块状底衬保证可读;前 5 秒抛出看点。"
+}

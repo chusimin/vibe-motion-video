@@ -1,0 +1,5 @@
+node_modules/
+.remotion/
+remotion/public/_work/
+*.log
+.DS_Store

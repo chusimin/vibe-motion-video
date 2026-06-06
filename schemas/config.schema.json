@@ -1,0 +1,90 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "vibemotion/config",
+  "title": "Config",
+  "description": "步骤②的访谈结果。产出类型/平台/风格/品牌/时长/配音/字幕等。",
+  "type": "object",
+  "required": ["outputType", "platform", "aspectRatio", "resolution", "fps", "durationTargetSec", "language", "voiceover", "captions"],
+  "additionalProperties": false,
+  "properties": {
+    "projectName": { "type": "string" },
+    "outputType": {
+      "type": "string",
+      "enum": ["showreel", "product-intro", "knowledge-explainer", "knowledge-popsci", "talking-blogger"],
+      "description": "产品showreel / 产品介绍 / 知识科普 / 知识博主口播 等"
+    },
+    "platform": {
+      "type": "string",
+      "enum": ["douyin", "tiktok", "youtube", "bilibili", "xiaohongshu", "reels", "shorts", "wechat-channels", "generic"]
+    },
+    "aspectRatio": { "type": "string", "enum": ["9:16", "16:9", "1:1", "4:5"] },
+    "resolution": {
+      "type": "object",
+      "required": ["width", "height"],
+      "additionalProperties": false,
+      "properties": {
+        "width": { "type": "integer", "minimum": 16 },
+        "height": { "type": "integer", "minimum": 16 }
+      }
+    },
+    "fps": { "type": "integer", "enum": [24, 25, 30, 60] },
+    "durationTargetSec": { "type": "number", "minimum": 3, "description": "整片目标时长" },
+    "firstSceneSec": { "type": "number", "minimum": 1, "description": "第一个镜头/开场段的时长(你步骤②要求)" },
+    "chunkSec": { "type": "number", "minimum": 5, "default": 15, "description": "分段确认的单段时长,默认 15s" },
+    "language": { "type": "string", "description": "成片语言,如 zh-CN" },
+    "style": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "preset": { "type": "string", "description": "风格预设名,见 presets/styles/" },
+        "palette": {
+          "type": "object",
+          "properties": {
+            "bg": { "type": "string" },
+            "fg": { "type": "string" },
+            "accent": { "type": "array", "items": { "type": "string" } }
+          }
+        },
+        "fonts": {
+          "type": "object",
+          "properties": {
+            "display": { "type": "string" },
+            "body": { "type": "string" }
+          }
+        },
+        "motion": { "type": "string", "enum": ["calm", "balanced", "punchy"], "default": "balanced" }
+      }
+    },
+    "brand": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "name": { "type": "string" },
+        "logo": { "type": "string", "description": "logo 文件路径" },
+        "colors": { "type": "array", "items": { "type": "string" } },
+        "voice": { "type": "string", "description": "品牌语气/口吻" }
+      }
+    },
+    "voiceover": {
+      "type": "object",
+      "required": ["enabled"],
+      "additionalProperties": false,
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "provider": { "type": "string", "enum": ["minimax", "elevenlabs", "azure", "openai", "none"] },
+        "voiceId": { "type": "string" },
+        "speed": { "type": "number", "default": 1.0 }
+      }
+    },
+    "captions": {
+      "type": "object",
+      "required": ["enabled"],
+      "additionalProperties": false,
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "style": { "type": "string", "enum": ["karaoke", "block", "line", "minimal"], "default": "karaoke" },
+        "burnIn": { "type": "boolean", "default": false, "description": "true=硬字幕烧进画面;false=软字幕另存 srt" }
+      }
+    }
+  }
+}

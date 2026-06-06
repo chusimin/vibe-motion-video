@@ -1,0 +1,13 @@
+{
+  "id": "generic",
+  "label": "通用横屏(无特定平台)",
+  "aspectRatio": "16:9",
+  "resolution": { "width": 1920, "height": 1080 },
+  "fps": 30,
+  "durationRange": [3, 600],
+  "hookSec": 3,
+  "safeArea": { "top": 60, "bottom": 60, "left": 60, "right": 60 },
+  "captions": { "style": "line", "burnIn": false, "maxCharsPerLine": 42 },
+  "loudnessLUFS": -14,
+  "notes": "中性默认:1080p 横屏、对称安全区、软字幕。不针对任何平台 UI 做避让,适合官网/通用分发后再裁切。"
+}

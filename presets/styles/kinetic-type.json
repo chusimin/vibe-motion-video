@@ -1,0 +1,14 @@
+{
+  "id": "kinetic-type",
+  "label": "Kinetic Type(动感大字幕 · punchy)",
+  "palette": {
+    "bg": "#0B0B0F",
+    "fg": "#FFFFFF",
+    "accent": ["#FFE600", "#FF2E63", "#08D9D6"]
+  },
+  "fonts": {
+    "display": "\"Archivo Black\", \"Source Han Sans SC\", \"PingFang SC\", \"Helvetica Neue\", Arial, sans-serif",
+    "body": "\"Archivo\", \"Source Han Sans SC\", \"PingFang SC\", \"Helvetica Neue\", Arial, sans-serif"
+  },
+  "motion": "punchy"
+}
