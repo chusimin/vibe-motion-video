@@ -5,7 +5,7 @@ description: 把任意内容自动做成视频的端到端流水线(Remotion 渲
 
 # vibe-motion-video
 
-把内容自动做成视频。**完整规格见 [PLAYBOOK.md](./PLAYBOOK.md)——开始前务必通读。** 想理解「一个 skill 怎么适配类型/风格/平台/时长多种需求」,见 **[docs/architecture.md](./docs/architecture.md)**(正交维度 + Resolver + 风格包)。
+把内容自动做成视频。**完整规格见 [PLAYBOOK.md](./PLAYBOOK.md)——开始前务必通读。** 想理解「一个 skill 怎么适配类型/风格/平台/时长多种需求」,见 **[docs/architecture.md](./docs/architecture.md)**(正交维度 + Resolver + 风格包)。想**喂新参考视频 / 加新风格 / 加新类型**(拆解→建风格包→质量涨),见 **[docs/contributing.md](./docs/contributing.md)**;做 showreel 看 **[docs/types/showreel.md](./docs/types/showreel.md)** + 风格包 `editorial-saas`(对标 ObiN)。
 
 ## 一句话心法
 **创意活你(agent)写 JSON,机械活调 `vibemotion` CLI。** 中间用渲染器无关的 JSON IR 当合约。每步落盘可续跑;③④⑥ 三道门必须等用户确认,别一口气跑完。
