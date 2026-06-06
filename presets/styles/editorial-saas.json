@@ -1,0 +1,25 @@
+{
+  "id": "editorial-saas",
+  "label": "Editorial SaaS(对标 ObiN / Varchasva 产品片)",
+  "palette": {
+    "bg": "#F4F2EC",
+    "fg": "#0B0B0C",
+    "accent": ["#6C4CF6", "#00D26A", "#FF4D4D"]
+  },
+  "darkFrame": "#0A0A0B",
+  "punchColors": ["#00D26A", "#6C4CF6", "#0A0A0B"],
+  "fonts": {
+    "display": "\"Helvetica Neue\", \"PingFang SC\", \"Arial Black\", sans-serif",
+    "body": "\"Helvetica Neue\", \"PingFang SC\", system-ui, sans-serif"
+  },
+  "motion": "balanced",
+  "treatment": {
+    "displayTracking": -0.03,
+    "displayWeight": 800,
+    "displayBleed": true,
+    "negativeSpace": "high",
+    "accentWord": "唯一关键词换强调色/斜体,其余中性 → 一帧一个焦点",
+    "contrastRhythm": "亮编辑帧 → 暗场 → 满色 punch 交替制造呼吸"
+  },
+  "notes": "对标 ObiN Studio / Varchasva 的 SaaS 产品 showreel:暖亮编辑底 + 巨型切边粗体排版 + 逐词强调 + 设备框产品 UI + 大量留白,紫为主、绿当火花、暗场与满色帧做节拍重音。克制:一帧一个焦点,动效靠 typography 分量而非装饰。来源拆解见 references/teardowns/showreel/。"
+}
