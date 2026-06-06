@@ -11,19 +11,29 @@
 
 import { BASE } from "./_base/index.jsx";
 
-// ───────────────────── 风格覆盖注册表(现在为空) ─────────────────────
-// 怎么加(示例,先别取消注释,等真有 styles/bento/Stat.jsx 时再开):
-//
-//   import BentoStat from "./styles/bento/Stat.jsx";
-//   import BentoTitle from "./styles/bento/Title.jsx";
-//   ...
-//   export const STYLE_OVERRIDES = {
-//     bento: { stat: BentoStat, title: BentoTitle },   // 只覆盖这两个;其余仍走 _base
-//   };
-//
-// 键约定:外层 = styleId(与 RenderSpec.styleId 一致),内层 = visual.type(与 storyboard 一致)。
+// ── editorial-saas 风格覆盖(对标 ObiN / Varchasva 产品片) ──
+// 全部静态 import(打包器只认静态路径,禁动态变量路径)。
+import BigTypeReveal from "./styles/editorial-saas/BigTypeReveal.jsx";
+import WordEmphasisKinetic from "./styles/editorial-saas/WordEmphasisKinetic.jsx";
+import DeviceFrame from "./styles/editorial-saas/DeviceFrame.jsx";
+import EditorialStat from "./styles/editorial-saas/EditorialStat.jsx";
+import PunchBulletList from "./styles/editorial-saas/PunchBulletList.jsx";
+import WorkTogetherOutro from "./styles/editorial-saas/WorkTogetherOutro.jsx";
+import PunchFrame from "./styles/editorial-saas/PunchFrame.jsx";
+
+// ───────────────────── 风格覆盖注册表 ─────────────────────
+// 怎么加 = 顶部加静态 import + 在此登记一项;只覆盖这风格真正长得不一样的那几个,其余仍走 _base。
+// 键约定:外层 = styleId(与 RenderSpec.styleId 一致),内层 = 归一后的 visual.type(连字符键,见 normalizeType)。
 export const STYLE_OVERRIDES = {
-  // 暂空:所有 type 全部走 _base 通用层。按拆解出的真实证据再增量添加。
+  "editorial-saas": {
+    title: BigTypeReveal,
+    "kinetic-text": WordEmphasisKinetic,
+    "product-capture": DeviceFrame,
+    stat: EditorialStat,
+    "bullet-list": PunchBulletList,
+    cta: WorkTogetherOutro,
+    "bg-only": PunchFrame,
+  },
 };
 
 // type 别名归一:容忍下划线/驼峰/简写写法,统一到 _base 注册表的连字符键。
