@@ -1,8 +1,8 @@
 // Stat —— 数据背书:超大数字滚动到目标值 + 标签。用于"用户数/节省时间/好评率"等。
 import React from "react";
 import { useCurrentFrame, useVideoConfig, spring, interpolate } from "remotion";
-import { SafeFrame, useEnter } from "../lib/anim.jsx";
-import { GLOBAL_TEXT_STYLE } from "../fonts.js";
+import { SafeFrame, useEnter } from "../../lib/anim.jsx";
+import { GLOBAL_TEXT_STYLE } from "../../fonts.js";
 
 // 从 value 字符串里拆出:前缀、数字、后缀(如 "¥98" → ["¥","98",""];"3.5x" → ["","3.5","x"];"10,000+" → ["","10000","+"])
 function parseValue(raw) {
@@ -25,7 +25,7 @@ function formatNum(n, decimals, hasComma) {
   return dec ? `${withSep}.${dec}` : withSep;
 }
 
-export default function Stat({ scene = {}, theme, safeArea, captionsReserve = 0 }) {
+export default function Stat({ scene = {}, theme, safeArea, captionsReserve = 0, justify = "center" }) {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const { motion, size, fonts, palette, accent } = theme;
@@ -41,7 +41,7 @@ export default function Stat({ scene = {}, theme, safeArea, captionsReserve = 0 
   const labelAnim = useEnter({ delay: 16, motion });
 
   return (
-    <SafeFrame safeArea={safeArea} extraBottom={captionsReserve}>
+    <SafeFrame safeArea={safeArea} extraBottom={captionsReserve} justify={justify}>
       <div
         style={{
           ...numAnim,

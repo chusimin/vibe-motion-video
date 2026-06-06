@@ -1,16 +1,23 @@
 // BulletList —— 要点列表:逐条上滑淡入,左对齐,圆点用强调色。
 import React from "react";
-import { SafeFrame, useEnter } from "../lib/anim.jsx";
-import { GLOBAL_TEXT_STYLE } from "../fonts.js";
+import { SafeFrame, useEnter } from "../../lib/anim.jsx";
+import { GLOBAL_TEXT_STYLE } from "../../fonts.js";
 
-export default function BulletList({ scene = {}, theme, safeArea, captionsReserve = 0 }) {
-  const { motion, size, fonts, palette, accent } = theme;
+export default function BulletList({ scene = {}, theme, safeArea, captionsReserve = 0, justify = "center" }) {
+  const { motion, size, fonts, palette, accent, layout } = theme;
   const heading = scene.onScreenText || "";
   const items = Array.isArray(scene.visual?.items) ? scene.visual.items : [];
   const headAnim = useEnter({ delay: 2, motion });
 
+  // 响应式:横屏且条目够多 → 双列;否则单列。
+  const twoCol = (layout?.columns ?? 1) >= 2 && items.length >= (layout?.multiColThreshold ?? 3);
+  const listContainer = twoCol
+    ? { display: "flex", flexWrap: "wrap", gap: `${size.body * 0.7}px ${size.h3}px`, width: "100%" }
+    : { display: "flex", flexDirection: "column", gap: size.body * 0.7, width: "100%" };
+  const rowBasis = twoCol ? `calc(50% - ${size.h3 / 2}px)` : "auto";
+
   return (
-    <SafeFrame safeArea={safeArea} align="flex-start" justify="center" extraBottom={captionsReserve}>
+    <SafeFrame safeArea={safeArea} align="flex-start" justify={justify} extraBottom={captionsReserve}>
       {heading ? (
         <div
           style={{
@@ -28,11 +35,11 @@ export default function BulletList({ scene = {}, theme, safeArea, captionsReserv
           {heading}
         </div>
       ) : null}
-      <div style={{ display: "flex", flexDirection: "column", gap: size.body * 0.7, width: "100%" }}>
+      <div style={listContainer}>
         {items.map((it, i) => {
           const a = useEnter({ delay: 8 + i * 6, motion, axis: "x", distance: motion.enterShiftPx });
           return (
-            <div key={i} style={{ ...a, display: "flex", alignItems: "flex-start", gap: size.body * 0.5 }}>
+            <div key={i} style={{ ...a, flex: twoCol ? `1 1 ${rowBasis}` : "0 0 auto", minWidth: 0, boxSizing: "border-box", display: "flex", alignItems: "flex-start", gap: size.body * 0.5 }}>
               <div
                 style={{
                   flex: "0 0 auto",

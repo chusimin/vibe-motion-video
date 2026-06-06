@@ -9,10 +9,12 @@ const round = (n) => Math.round(n);
 
 // 从 props 推导合成元数据。durationInFrames 优先用 config._durationSec(render 命令按 chunk 精确传),
 // 否则用 scenes 末镜结尾,再否则用 totalDurationSec。
-function deriveMetadata({ scenes = [], config = {} }) {
-  const fps = config.fps || 30;
-  const width = config.resolution?.width || 1080;
-  const height = config.resolution?.height || 1920;
+// 画幅/fps:有 spec.format 优先用它(施工图),否则回退 config(向后兼容)。
+function deriveMetadata({ scenes = [], config = {}, spec = null }) {
+  const fmt = (spec && spec.format) || {};
+  const fps = fmt.fps || config.fps || 30;
+  const width = fmt.width || config.resolution?.width || 1080;
+  const height = fmt.height || config.resolution?.height || 1920;
 
   let durSec = config._durationSec;
   if (typeof durSec !== "number" || durSec <= 0) {

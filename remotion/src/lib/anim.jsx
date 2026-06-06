@@ -79,7 +79,9 @@ export function useKenBurns(motionDesc = "ken-burns") {
 }
 
 // 安全区布局容器:把内容收进平台安全区内(避开平台 UI 与字幕带)。
-// padBottomForCaptions:为底部字幕额外预留(captionsEnabled 时由调用方传)。
+// extraBottom:为底部字幕额外预留(captionsEnabled 时由调用方传)。
+// justify:竖直主轴对齐(响应式锚点)。模板可显式传(如 VibeVideo 透传的画幅锚点
+//   center/flex-end);不传则用模板自带默认。
 export function SafeFrame({ safeArea = {}, children, style, align = "center", justify = "center", extraBottom = 0 }) {
   const { top = 60, bottom = 60, left = 60, right = 60 } = safeArea;
   return (

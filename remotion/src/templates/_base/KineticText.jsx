@@ -1,8 +1,8 @@
 // KineticText —— 动感大字幕:逐词/逐行弹入,适合开场钩子。punchy 风格主力。
 import React from "react";
 import { useCurrentFrame, useVideoConfig, spring, interpolate } from "remotion";
-import { SafeFrame } from "../lib/anim.jsx";
-import { GLOBAL_TEXT_STYLE } from "../fonts.js";
+import { SafeFrame } from "../../lib/anim.jsx";
+import { GLOBAL_TEXT_STYLE } from "../../fonts.js";
 
 // 把文字切成"词组"——中文按字符块 + 标点断,英文按空格断。
 function tokenize(text) {
@@ -22,16 +22,21 @@ function tokenize(text) {
   return groups;
 }
 
-export default function KineticText({ scene = {}, theme, safeArea, captionsReserve = 0 }) {
+export default function KineticText({ scene = {}, theme, safeArea, captionsReserve = 0, justify = "center" }) {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
-  const { motion, size, fonts, palette, accent } = theme;
+  const { motion, size, fonts, palette, accent, layout } = theme;
   const text = scene.onScreenText || scene.vo || scene.purpose || "";
   const groups = tokenize(text);
-  const perDelay = Math.max(2, Math.round(5 / (motion.speed || 1))); // 每词间隔帧
+  // 逐词间隔(帧):优先用 spec 的 motion.stagger(单位「秒」,需 ×fps 转帧);
+  // 否则按 personality 的 speed 反推。punchy stagger 小→词砸得密;calm 大→从容。
+  const perDelay = Number.isFinite(motion.stagger) && motion.stagger > 0
+    ? Math.max(1, Math.round(motion.stagger * fps))
+    : Math.max(2, Math.round(5 / (motion.speed || 1)));
+  const maxW = layout?.maxContentWidth || "100%";
 
   return (
-    <SafeFrame safeArea={safeArea} extraBottom={captionsReserve} style={{ gap: 0 }}>
+    <SafeFrame safeArea={safeArea} extraBottom={captionsReserve} justify={justify} style={{ gap: 0 }}>
       <div
         style={{
           display: "flex",
@@ -39,7 +44,7 @@ export default function KineticText({ scene = {}, theme, safeArea, captionsReser
           justifyContent: "center",
           alignItems: "center",
           gap: `${size.h2 * 0.12}px ${size.h2 * 0.22}px`,
-          maxWidth: "100%",
+          maxWidth: maxW,
         }}
       >
         {groups.map((g, i) => {

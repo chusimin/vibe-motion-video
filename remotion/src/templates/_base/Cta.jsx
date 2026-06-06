@@ -1,11 +1,11 @@
 // Cta —— 行动召唤:大标题 + 行动按钮(网址/搜索词)+ 可选品牌定格。
 import React from "react";
 import { useCurrentFrame, useVideoConfig, spring, interpolate } from "remotion";
-import { SafeFrame, useEnter, usePopIn } from "../lib/anim.jsx";
-import { GLOBAL_TEXT_STYLE } from "../fonts.js";
-import { withAlpha } from "../theme.js";
+import { SafeFrame, useEnter, usePopIn } from "../../lib/anim.jsx";
+import { GLOBAL_TEXT_STYLE } from "../../fonts.js";
+import { withAlpha } from "../../theme.js";
 
-export default function Cta({ scene = {}, theme, safeArea, captionsReserve = 0 }) {
+export default function Cta({ scene = {}, theme, safeArea, captionsReserve = 0, justify = "center" }) {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const { motion, size, fonts, palette, accent } = theme;
@@ -19,7 +19,7 @@ export default function Cta({ scene = {}, theme, safeArea, captionsReserve = 0 }
   const pulse = 1 + 0.02 * Math.sin((frame / fps) * Math.PI * 2 * 0.6);
 
   return (
-    <SafeFrame safeArea={safeArea} extraBottom={captionsReserve}>
+    <SafeFrame safeArea={safeArea} extraBottom={captionsReserve} justify={justify}>
       <div
         style={{
           ...headAnim,

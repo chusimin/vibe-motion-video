@@ -2,8 +2,8 @@
 // 不铺满全屏,作为叠加层;背景通常是录屏/人像(由 Background 或上层 ProductCapture 提供)。
 import React from "react";
 import { AbsoluteFill, useCurrentFrame, useVideoConfig, spring, interpolate } from "remotion";
-import { GLOBAL_TEXT_STYLE } from "../fonts.js";
-import { withAlpha } from "../theme.js";
+import { GLOBAL_TEXT_STYLE } from "../../fonts.js";
+import { withAlpha } from "../../theme.js";
 
 export default function LowerThird({ scene = {}, theme, safeArea, captionsReserve = 0 }) {
   const frame = useCurrentFrame();

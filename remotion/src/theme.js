@@ -105,7 +105,94 @@ export function resolveBackground(desc, palette) {
   return { type: "color", css: d };
 }
 
-// 主入口:从 config 生成 theme 对象。
+// 由 width/height 判画幅大类:portrait(竖) / landscape(横) / square(方)。
+export function aspectOf(width, height) {
+  const w = width || 1080;
+  const h = height || 1920;
+  const r = w / h;
+  if (r >= 1.15) return "landscape";
+  if (r <= 0.87) return "portrait";
+  return "square";
+}
+
+// 响应式布局描述符:模板据此 reflow(列数 / 主体锚点 / 整体宽度上限)。
+// 思路同网页响应式声明——同一镜头,竖屏单列居中偏下、横屏居中或双列。
+function layoutOf(aspect) {
+  if (aspect === "landscape") {
+    // 横屏:水平空间富余 → 主体竖直居中、可双列(多项内容铺成两列)、内容收窄到 ~84% 留呼吸。
+    return { aspect, columns: 2, anchor: "center", maxContentWidth: "84%", multiColThreshold: 3 };
+  }
+  if (aspect === "square") {
+    return { aspect, columns: 1, anchor: "center", maxContentWidth: "92%", multiColThreshold: 99 };
+  }
+  // 竖屏:单列、主体略偏下(给顶部留白/钩子呼吸),内容几乎占满宽。
+  return { aspect, columns: 1, anchor: "lower", maxContentWidth: "96%", multiColThreshold: 99 };
+}
+
+// 把 anchor 语义映射成 SafeFrame 的 justifyContent。
+export function justifyForAnchor(anchor) {
+  if (anchor === "lower") return "flex-end"; // 偏下(配合 SafeFrame 底部安全区/字幕预留,自然落在中下)
+  if (anchor === "upper") return "flex-start";
+  return "center";
+}
+
+// 内部:从「已规整的 tokens/motion/format」生成 theme。buildTheme 与 buildThemeFromSpec 共用。
+function assembleTheme({ palette, fonts, motion, width, height }) {
+  const aspect = aspectOf(width, height);
+  const layout = layoutOf(aspect);
+
+  // 基准字号按高度缩放:以 1920 高为基准 1.0(竖屏大字),其它分辨率等比。
+  const fontScale = (height || 1920) / 1920;
+  // 横屏补偿:横屏高度小→fontScale 小,但横向空间富余,给大字号(hero/h1/statNumber)一点回补,
+  // 避免横屏标题过于胆怯;正文不补,防止溢出。补偿温和(1.35x)且对 fontScale 封顶。
+  const wideBoost = aspect === "landscape" ? 1.35 : 1;
+
+  return {
+    palette,
+    fonts,
+    motion,
+    fontScale,
+    aspect,
+    layout,
+    accent: (i = 0) => palette.accent[i % palette.accent.length],
+    // 常用排版尺度(px,已乘 fontScale;大字号叠加横屏补偿)
+    size: {
+      hero: Math.round(150 * fontScale * wideBoost),
+      h1: Math.round(104 * fontScale * wideBoost),
+      h2: Math.round(76 * fontScale * (aspect === "landscape" ? 1.15 : 1)),
+      h3: Math.round(56 * fontScale),
+      body: Math.round(44 * fontScale),
+      small: Math.round(34 * fontScale),
+      caption: Math.round(52 * fontScale),
+      statNumber: Math.round(300 * fontScale * wideBoost),
+    },
+  };
+}
+
+// 把 personality + 可选 spring/tracking/stagger 微调,折成模板可用的 motion 对象。
+// personality 决定档位(calm 柔 / punchy 脆);spec.motion.spring 等若给,叠加微调。
+function buildMotion({ personality, spring, stagger, tracking } = {}) {
+  const key = ["calm", "balanced", "punchy"].includes(personality) ? personality : "balanced";
+  const base = { ...MOTION_PRESETS[key] };
+  // spring 微调(RenderSpec.motion.spring 可含 damping/mass/stiffness 覆盖)
+  if (spring && typeof spring === "object") {
+    if (Number.isFinite(spring.damping)) base.damping = spring.damping;
+    if (Number.isFinite(spring.mass)) base.mass = spring.mass;
+    if (Number.isFinite(spring.stiffness)) base.stiffness = spring.stiffness;
+  }
+  return {
+    key,
+    personality: key,
+    ...base,
+    // stagger:逐项出场间隔,单位**秒**(与 RenderSpec.motion.stagger 一致;模板用时 ×fps 转帧)。
+    //   缺省 undefined,模板回退到各自基于 speed 的默认步进。
+    stagger: Number.isFinite(stagger) ? stagger : undefined,
+    // tracking:字距微调(em),透传给需要的模板。
+    tracking: Number.isFinite(tracking) ? tracking : undefined,
+  };
+}
+
+// 主入口(兼容旧路径):从 config 生成 theme 对象。spec 缺失时 VibeVideo 仍走这条。
 export function buildTheme(config = {}) {
   const style = config.style || {};
   const palette = {
@@ -123,31 +210,49 @@ export function buildTheme(config = {}) {
     body: withFallback(style.fonts?.body),
   };
 
-  const motionKey = ["calm", "balanced", "punchy"].includes(style.motion) ? style.motion : "balanced";
-  const motion = { key: motionKey, ...MOTION_PRESETS[motionKey] };
+  const motion = buildMotion({ personality: style.motion });
 
-  // 基准字号按高度缩放:以 1920 高为基准 1.0(竖屏大字),其它分辨率等比。
+  const width = config.resolution?.width || 1080;
   const height = config.resolution?.height || 1920;
-  const fontScale = height / 1920;
+  return assembleTheme({ palette, fonts, motion, width, height });
+}
 
-  return {
-    palette,
-    fonts,
-    motion,
-    fontScale,
-    accent: (i = 0) => palette.accent[i % palette.accent.length],
-    // 常用排版尺度(px,已乘 fontScale)
-    size: {
-      hero: Math.round(150 * fontScale),
-      h1: Math.round(104 * fontScale),
-      h2: Math.round(76 * fontScale),
-      h3: Math.round(56 * fontScale),
-      body: Math.round(44 * fontScale),
-      small: Math.round(34 * fontScale),
-      caption: Math.round(52 * fontScale),
-      statNumber: Math.round(300 * fontScale),
-    },
+// 新入口:从 RenderSpec 生成 theme 对象(与 buildTheme 同形)。
+// spec.tokens → palette/fonts;spec.motion → 动效性格;spec.format → 画幅(驱动字号/响应式)。
+// 任一字段缺失都安全兜底(沿用 DEFAULT_PALETTE / balanced / 1080x1920)。
+export function buildThemeFromSpec(spec = {}) {
+  const t = spec.tokens || {};
+  const palette = {
+    bg: isHex(t.bg) ? t.bg : DEFAULT_PALETTE.bg,
+    fg: isHex(t.fg) ? t.fg : DEFAULT_PALETTE.fg,
+    accent:
+      Array.isArray(t.accent) && t.accent.length
+        ? t.accent.filter(isHex)
+        : DEFAULT_PALETTE.accent,
   };
+  if (!palette.accent.length) palette.accent = DEFAULT_PALETTE.accent;
+
+  const fonts = {
+    display: withFallback(t.fontDisplay),
+    body: withFallback(t.fontBody),
+  };
+
+  const m = spec.motion || {};
+  const motion = buildMotion({
+    personality: m.personality,
+    spring: m.spring,
+    stagger: m.stagger,
+    tracking: m.tracking,
+  });
+
+  const fmt = spec.format || {};
+  const width = fmt.width || 1080;
+  const height = fmt.height || 1920;
+  const theme = assembleTheme({ palette, fonts, motion, width, height });
+  // tokens.radius 透传(部分模板/未来风格包会用到统一圆角)
+  if (Number.isFinite(t.radius)) theme.radius = t.radius;
+  theme.styleId = spec.styleId || null;
+  return theme;
 }
 
 export { MOTION_PRESETS, FALLBACK_FONT_STACK, DEFAULT_PALETTE, isHex };

@@ -1,8 +1,8 @@
 // Quote —— 金句/引用:大号引号 + 引文 + 署名。
 import React from "react";
-import { SafeFrame, useEnter } from "../lib/anim.jsx";
-import { GLOBAL_TEXT_STYLE } from "../fonts.js";
-import { withAlpha } from "../theme.js";
+import { SafeFrame, useEnter } from "../../lib/anim.jsx";
+import { GLOBAL_TEXT_STYLE } from "../../fonts.js";
+import { withAlpha } from "../../theme.js";
 
 export default function Quote({ scene = {}, theme, safeArea, captionsReserve = 0 }) {
   const { motion, size, fonts, palette, accent } = theme;

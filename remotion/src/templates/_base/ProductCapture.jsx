@@ -3,9 +3,9 @@
 // callouts: [{ text, x, y, at? }] —— x/y 为 0..1 相对坐标,at 为出现秒(相对 scene 起点)。
 import React from "react";
 import { AbsoluteFill, Img, OffthreadVideo, useCurrentFrame, useVideoConfig, spring, interpolate } from "remotion";
-import { useKenBurns, useEnter } from "../lib/anim.jsx";
-import { GLOBAL_TEXT_STYLE } from "../fonts.js";
-import { withAlpha } from "../theme.js";
+import { useKenBurns, useEnter } from "../../lib/anim.jsx";
+import { GLOBAL_TEXT_STYLE } from "../../fonts.js";
+import { withAlpha } from "../../theme.js";
 
 // 粗判媒体类型:扩展名优先。
 function isVideoSrc(src) {
