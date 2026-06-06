@@ -81,8 +81,9 @@ references/teardowns/<类型>/     拆解卡沉淀                              
 ```
 
 ## 7. 现状 vs 待办
-- ✅ 已有:三个正交预设目录、config.json 收齐所有维度、config init 已做部分合并、11 个基础模板。
-- 🔜 第一步:抽出显式 `resolver.mjs` + 密度拟合(structures 加 priority/min/max),RenderSpec 带 styleId。
-- 🔜 随后:模板目录 `_base/` 化 + 模板解析器(override/fallback)+ 响应式布局。
-- 🔜 素材需求闸门:`vibemotion assets`(ingest 自动绑定 + 缺口清单 + 校验)+ storyboard schema 加 `visual.assetReq`。
-- 🔮 后期:按拆解证据逐步加风格包(组件覆盖 + 场景配方)、类型 Playbook、Teardown 工具。
+- ✅ 三个正交预设目录、config.json 收齐所有维度。
+- ✅ **Resolver** `src/lib/resolver.mjs`(选择→RenderSpec,带 styleId)+ **密度拟合** `fitBeats`(structures 已加 priority/min/ideal/max);render 透传 spec。
+- ✅ **模板 `_base/` 化** + 解析器 `resolve.jsx`(override/fallback)+ VibeVideo 读 spec + **响应式布局**(9:16/16:9 自动 reflow)+ 动效性格。`styles/`、`blocks/` 空 slots 就位。
+- ✅ **素材需求闸门** `vibemotion assets`(ingest 自动收集 + 自动绑定 + 缺口清单 + ffprobe 校验)+ schema `visual.assetReq`。
+- ✅ 内容 landing zones:`docs/motion-constitution.md`、`docs/types/_TEMPLATE.md`、`references/teardowns/_TEMPLATE.md`。
+- 🔮 后期(你慢慢加):按拆解证据加**风格包**(`templates/styles/<风格>/` 组件覆盖 + `blocks/<风格>/` 场景配方)、**类型 Playbook**(`docs/types/<类型>.md`)、**Teardown 工具** `vibemotion teardown`。骨架已留好,填内容即可。
