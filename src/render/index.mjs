@@ -12,6 +12,8 @@ import { bundle } from "@remotion/bundler";
 import { selectComposition, renderMedia, ensureBrowser } from "@remotion/renderer";
 import { FILES, DIRS } from "../lib/project.mjs";
 import { UserError, log as defaultLog } from "../lib/log.mjs";
+import { loadPreset } from "../lib/presets.mjs";
+import { resolveRenderSpec } from "../lib/resolver.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 // remotion 工程根(含 public/ 与 src/index.jsx)
@@ -156,7 +158,7 @@ async function getServeUrl(log) {
 }
 
 // 渲一个 chunk(或全片伪 chunk)。assets 已暂存、scenes 已时移。
-async function renderOneChunk({ project, config, safeArea, scenes, captionsMap, durSec, outPath, fps, log, label }) {
+async function renderOneChunk({ project, config, safeArea, spec, scenes, captionsMap, durSec, outPath, fps, log, label }) {
   const inputProps = {
     scenes,
     config: {
@@ -164,6 +166,8 @@ async function renderOneChunk({ project, config, safeArea, scenes, captionsMap, 
       _durationSec: durSec, // 精确驱动 durationInFrames
       _captionMaxChars: safeArea._maxCharsPerLine || config._captionMaxChars || 14,
     },
+    // RenderSpec(施工图):模板优先读它;过渡期 config/safeArea 仍保留兼容。
+    spec,
     safeArea,
     captionsMap,
   };
@@ -250,17 +254,32 @@ async function loadContext(project, log) {
   // 平台 safeArea + 字幕每行字数:从 presets/platforms/<platform>.json 读。
   let safeArea = { top: 60, bottom: 60, left: 60, right: 60 };
   let maxCharsPerLine = 14;
+  let platformPreset = null;
   try {
-    const platAbs = path.resolve(__dirname, "../../presets/platforms", `${config.platform}.json`);
-    const plat = JSON.parse(await fs.readFile(platAbs, "utf8"));
-    if (plat.safeArea) safeArea = plat.safeArea;
-    if (plat.captions?.maxCharsPerLine) maxCharsPerLine = plat.captions.maxCharsPerLine;
+    platformPreset = await loadPreset("platforms", config.platform);
+    if (platformPreset.safeArea) safeArea = platformPreset.safeArea;
+    if (platformPreset.captions?.maxCharsPerLine) maxCharsPerLine = platformPreset.captions.maxCharsPerLine;
   } catch {
     log.warn(`未找到平台预设 ${config.platform},使用默认安全区 ${JSON.stringify(safeArea)}。`);
   }
   safeArea = { ...safeArea, _maxCharsPerLine: maxCharsPerLine };
 
-  return { sb, config, fps, safeArea };
+  // 风格预设(供 resolver 兜底取 token;config.style 已含合并结果,缺了能从这里补)。
+  let stylePreset = null;
+  const styleName = config.style?.preset;
+  if (styleName) {
+    try { stylePreset = await loadPreset("styles", styleName); }
+    catch { /* 风格预设缺失不致命:config.style 里已有合并后的 palette/fonts/motion */ }
+  }
+
+  // 跑 Resolver → RenderSpec(施工图)。模板将只读它(过渡期仍保留 config/safeArea)。
+  const spec = resolveRenderSpec({
+    config,
+    platformPreset: platformPreset || {},
+    stylePreset: stylePreset || {},
+  });
+
+  return { sb, config, fps, safeArea, spec };
 }
 
 // 准备一个 chunk:跳过判断 + 暂存素材。
@@ -292,11 +311,11 @@ async function prepareChunk({ project, sb, config, fps, safeArea, chunk, force, 
 }
 
 // 渲染已准备好的 chunk(素材已暂存进 public/_work)。
-async function renderPrepared({ project, config, fps, safeArea, prepared, log }) {
+async function renderPrepared({ project, config, fps, safeArea, spec, prepared, log }) {
   const { chunk, shifted, captionsMap, durSec, outAbs, outRel } = prepared;
   log.step(`render`, `chunk ${chunk.index}  [${chunk.sceneIds.join(", ")}]  ${durSec.toFixed(2)}s @ ${config.resolution.width}x${config.resolution.height} ${fps}fps`);
   await renderOneChunk({
-    project, config, safeArea, scenes: shifted, captionsMap, durSec,
+    project, config, safeArea, spec, scenes: shifted, captionsMap, durSec,
     outPath: outAbs, fps, log, label: `chunk ${chunk.index}`,
   });
   await markChunkRendered(project, chunk.index, outRel);
@@ -305,7 +324,7 @@ async function renderPrepared({ project, config, fps, safeArea, prepared, log })
 }
 
 // 全片渲染(--full):整条 storyboard 当一个合成,预览/终片用。不切 chunk、不改 chunks 状态。
-async function doFull({ project, sb, config, fps, safeArea, force, log }) {
+async function doFull({ project, sb, config, fps, safeArea, spec, force, log }) {
   const outRel = path.posix.join(DIRS.renders, `full.mp4`);
   const outAbs = project.p(DIRS.renders, `full.mp4`);
   try {
@@ -321,7 +340,7 @@ async function doFull({ project, sb, config, fps, safeArea, force, log }) {
 
   log.step("render", `--full 整片  ${shifted.length} 镜  ${durSec.toFixed(2)}s @ ${config.resolution.width}x${config.resolution.height} ${fps}fps`);
   await renderOneChunk({
-    project, config, safeArea, scenes: shifted, captionsMap, durSec,
+    project, config, safeArea, spec, scenes: shifted, captionsMap, durSec,
     outPath: outAbs, fps, log, label: "full",
   });
   log.ok(`整片 → ${outRel}`);
@@ -344,14 +363,14 @@ export default async function run(ctx) {
     throw new UserError("--chunk / --all / --full 三选一,不能同时给。");
   }
 
-  const { sb, config, fps, safeArea } = await loadContext(project, log);
+  const { sb, config, fps, safeArea, spec } = await loadContext(project, log);
 
   // 确保渲染用的 Chromium 就绪(首次会自动下载)。
   await ensureBrowser();
 
   try {
     if (wantFull) {
-      await doFull({ project, sb, config, fps, safeArea, force, log });
+      await doFull({ project, sb, config, fps, safeArea, spec, force, log });
       return;
     }
 
@@ -369,7 +388,7 @@ export default async function run(ctx) {
         if (p) prepared.push(p);
       }
       for (const p of prepared) {
-        await renderPrepared({ project, config, fps, safeArea, prepared: p, log });
+        await renderPrepared({ project, config, fps, safeArea, spec, prepared: p, log });
       }
       log.ok(`全部 ${sb.chunks.length} 段渲染完成。`);
       return;
@@ -384,7 +403,7 @@ export default async function run(ctx) {
       throw new UserError(`找不到 chunk ${idx}。可用分段:${avail}。`);
     }
     const prepared = await prepareChunk({ project, sb, config, fps, safeArea, chunk, force, log });
-    if (prepared) await renderPrepared({ project, config, fps, safeArea, prepared, log });
+    if (prepared) await renderPrepared({ project, config, fps, safeArea, spec, prepared, log });
   } catch (e) {
     // 常见错误补充排查提示
     enrichError(e);

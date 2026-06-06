@@ -3,6 +3,7 @@
 import { FILES } from "../lib/project.mjs";
 import { assertValid } from "../lib/validate.mjs";
 import { loadPreset, listPresets } from "../lib/presets.mjs";
+import { fitBeats } from "../lib/resolver.mjs";
 import { UserError } from "../lib/log.mjs";
 
 // 产出类型 → 默认结构预设名(同名)。
@@ -187,7 +188,26 @@ async function configShow(ctx) {
     throw new UserError("当前项目还没有 config.json。先运行 `vibemotion config init --type ... --platform ...`。");
   }
   log.json(config);
+  // 按当前时长跑一遍密度拟合,给 agent 一个「该排几个节拍、各占几秒」的建议(只读,不写盘)。
+  await printFittedBeats(config, log);
   return config;
+}
+
+// 打印密度拟合后的建议节拍(类型 × 时长)。结构预设缺失则静默跳过。
+async function printFittedBeats(config, log) {
+  if (!log || typeof config?.durationTargetSec !== "number") return;
+  let structurePreset;
+  try { structurePreset = await loadPreset("structures", config.outputType); }
+  catch { return; }
+  const fps = config.fps || 30;
+  const beats = fitBeats(structurePreset, config.durationTargetSec, fps);
+  if (!beats.length) return;
+  const total = beats.reduce((a, b) => a + b.sec, 0);
+  log.step("节拍建议", `${config.outputType} @ ${config.durationTargetSec}s → ${beats.length} 拍(密度拟合,Σ≈${total.toFixed(2)}s)`);
+  for (const b of beats) {
+    log.raw(`    ${String(b.role).padEnd(14)} ${String(b.sec.toFixed(2) + "s").padStart(7)}  ${b.visualHint ? "[" + b.visualHint + "]  " : ""}${(b.purpose || "").slice(0, 40)}\n`);
+  }
+  log.dim("    (节拍按当前时长伸缩;真正分镜由 agent 写 storyboard.json)");
 }
 
 // ─────────────────────── validate ───────────────────────

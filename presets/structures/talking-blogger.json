@@ -9,39 +9,63 @@
     {
       "role": "hook",
       "purpose": "开口第一句就是钩子:抛强观点/争议/承诺(\"今天讲个反常识的……\"),让人不划走。配大字幕。",
+      "priority": 5,
+      "minSec": 3,
+      "idealSec": 4,
+      "maxSec": 6,
       "suggestedSec": 4,
       "visualHint": "kinetic-text"
     },
     {
       "role": "thesis",
       "purpose": "亮明核心观点/结论:一句话立场 + 这期要给你什么(预告价值),建立信任。",
+      "priority": 5,
+      "minSec": 4,
+      "idealSec": 6,
+      "maxSec": 9,
       "suggestedSec": 6,
       "visualHint": "lower-third"
     },
     {
       "role": "point",
       "purpose": "论点 ①:给出第一个理由/方法,配要点字幕与 B-roll 佐证,口播为主。",
+      "priority": 4,
+      "minSec": 8,
+      "idealSec": 14,
+      "maxSec": 20,
       "suggestedSec": 14,
       "visualHint": "bullet-list"
     },
     {
       "role": "point",
       "purpose": "论点 ②:第二个理由/方法,可举身边例子或对比,保持口播节奏与信息密度。",
+      "priority": 3,
+      "minSec": 8,
+      "idealSec": 14,
+      "maxSec": 20,
       "suggestedSec": 14,
       "visualHint": "bullet-list"
     },
     {
       "role": "takeaway",
       "purpose": "落到可执行:把观点收成一句能马上用的干货/行动建议,提升\"有用感\"。",
+      "priority": 5,
+      "minSec": 6,
+      "idealSec": 12,
+      "maxSec": 17,
       "suggestedSec": 12,
       "visualHint": "kinetic-text"
     },
     {
       "role": "cta",
       "purpose": "引导互动:抛问题求评论、求关注/三连,预告下期。",
+      "priority": 4,
+      "minSec": 3,
+      "idealSec": 6,
+      "maxSec": 8,
       "suggestedSec": 6,
       "visualHint": "cta"
     }
   ],
-  "notes": "口播驱动:时长与镜头分割跟着语速走,字幕必开且为视觉主体(karaoke/逐句)。point 数量按时长加减(短片 1-2 个,长片 3-4 个)。B-roll/要点辅助,别喧宾夺主。"
+  "notes": "口播驱动:时长与镜头分割跟着语速走,字幕必开且为视觉主体(karaoke/逐句)。point 数量按时长加减(短片 1-2 个,长片 3-4 个)。B-roll/要点辅助,别喧宾夺主。密度拟合:hook/thesis/takeaway priority=5(观点骨架),point①/cta=4,point②=3(短片先砍第二个论点)。"
 }

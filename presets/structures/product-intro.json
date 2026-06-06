@@ -9,45 +9,73 @@
     {
       "role": "hook",
       "purpose": "开场抛出目标用户最在意的问题或愿望,用一句话+一帧画面建立\"这跟我有关\"。",
+      "priority": 5,
+      "minSec": 3,
+      "idealSec": 4,
+      "maxSec": 6,
       "suggestedSec": 4,
       "visualHint": "kinetic-text"
     },
     {
       "role": "problem",
       "purpose": "展开痛点场景:现状有多麻烦/费时/容易出错,放大代价,让解决方案更有分量。",
+      "priority": 4,
+      "minSec": 4,
+      "idealSec": 6,
+      "maxSec": 9,
       "suggestedSec": 6,
       "visualHint": "kinetic-text"
     },
     {
       "role": "solution",
       "purpose": "产品登场并给出一句话定位:它是什么、核心价值主张是什么,界面/实物亮相。",
+      "priority": 5,
+      "minSec": 4,
+      "idealSec": 6,
+      "maxSec": 9,
       "suggestedSec": 6,
       "visualHint": "title"
     },
     {
       "role": "how-it-works",
       "purpose": "用 1-2-3 步演示怎么用:录屏走通主流程,让人相信\"我也能轻松上手\"。",
+      "priority": 5,
+      "minSec": 6,
+      "idealSec": 10,
+      "maxSec": 16,
       "suggestedSec": 10,
       "visualHint": "product-capture"
     },
     {
       "role": "benefits",
       "purpose": "讲清能带来的好处/差异化卖点(2-3 条),与竞品或旧方式对比,突出\"为什么选它\"。",
+      "priority": 3,
+      "minSec": 5,
+      "idealSec": 8,
+      "maxSec": 12,
       "suggestedSec": 8,
       "visualHint": "feature-reveal"
     },
     {
       "role": "proof",
       "purpose": "可信背书:用户评价、数据、案例、权威/获奖,降低决策顾虑。",
+      "priority": 3,
+      "minSec": 4,
+      "idealSec": 6,
+      "maxSec": 9,
       "suggestedSec": 6,
       "visualHint": "stat"
     },
     {
       "role": "cta",
       "purpose": "明确下一步:在哪买/在哪试/优惠信息,品牌收尾。",
+      "priority": 5,
+      "minSec": 3,
+      "idealSec": 5,
+      "maxSec": 7,
       "suggestedSec": 5,
       "visualHint": "cta"
     }
   ],
-  "notes": "比 showreel 更重\"说服\":problem 与 benefits 给足时间。how-it-works 用真实录屏建立信任。时长紧可合并 benefits 到 solution。"
+  "notes": "比 showreel 更重\"说服\":problem 与 benefits 给足时间。how-it-works 用真实录屏建立信任。时长紧可合并 benefits 到 solution。密度拟合:hook/solution/how-it-works/cta priority=5(讲清产品的骨架),problem=4,benefits/proof=3(短片先砍)。"
 }

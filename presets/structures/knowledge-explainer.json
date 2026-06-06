@@ -9,39 +9,63 @@
     {
       "role": "question",
       "purpose": "抛出一个让人想知道答案的问题或反常识现象,制造好奇缺口,给出本期要解答的承诺。",
+      "priority": 5,
+      "minSec": 4,
+      "idealSec": 6,
+      "maxSec": 9,
       "suggestedSec": 6,
       "visualHint": "kinetic-text"
     },
     {
       "role": "context",
       "purpose": "(可选)交代背景/为什么这个问题重要,让听众有接住概念的前提。",
+      "priority": 2,
+      "minSec": 4,
+      "idealSec": 6,
+      "maxSec": 9,
       "suggestedSec": 6,
       "visualHint": "title"
     },
     {
       "role": "concept",
       "purpose": "给出核心概念/定义/原理:一句话讲清,再拆成 2-3 个要点,用图示或要点列表帮助理解。",
+      "priority": 5,
+      "minSec": 10,
+      "idealSec": 16,
+      "maxSec": 24,
       "suggestedSec": 16,
       "visualHint": "bullet-list"
     },
     {
       "role": "example",
       "purpose": "用一个具体、贴近生活的例子把抽象概念落地,演示概念怎么运作,\"原来如此\"的顿悟点。",
+      "priority": 4,
+      "minSec": 10,
+      "idealSec": 18,
+      "maxSec": 26,
       "suggestedSec": 18,
       "visualHint": "feature-reveal"
     },
     {
       "role": "summary",
       "purpose": "小结:一句话复述结论 + 关键要点回顾,可升华到\"所以这对你意味着什么\"。",
+      "priority": 5,
+      "minSec": 5,
+      "idealSec": 9,
+      "maxSec": 13,
       "suggestedSec": 9,
       "visualHint": "kinetic-text"
     },
     {
       "role": "cta",
       "purpose": "引导互动/关注/下一集:留一个延伸问题或资源。",
+      "priority": 4,
+      "minSec": 3,
+      "idealSec": 5,
+      "maxSec": 7,
       "suggestedSec": 5,
       "visualHint": "cta"
     }
   ],
-  "notes": "核心是\"问题→概念→例子→小结\"四拍闭环。concept 与 example 给足时长是讲清楚的关键;example 务必具体可感。context 可选,短片直接 question→concept。"
+  "notes": "核心是\"问题→概念→例子→小结\"四拍闭环。concept 与 example 给足时长是讲清楚的关键;example 务必具体可感。context 可选,短片直接 question→concept。密度拟合:question/concept/summary priority=5(讲清楚的骨架),example/cta=4,context=2(短片先砍)。"
 }

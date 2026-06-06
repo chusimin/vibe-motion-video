@@ -9,48 +9,80 @@
     {
       "role": "hook",
       "purpose": "0-3s 用最炸的一帧/一句抓住眼球:抛出产品能解决的爽点或最惊艳的成品效果,让人停下划动的手。",
+      "priority": 5,
+      "minSec": 2,
+      "idealSec": 3,
+      "maxSec": 4,
       "suggestedSec": 3,
       "visualHint": "kinetic-text"
     },
     {
       "role": "problem",
       "purpose": "(可选)点出目标用户当前的痛点/低效场景,制造\"这说的就是我\"的共鸣,为产品登场铺垫。短内容可省略。",
+      "priority": 2,
+      "minSec": 2,
+      "idealSec": 3,
+      "maxSec": 5,
       "suggestedSec": 3,
       "visualHint": "kinetic-text"
     },
     {
       "role": "solution",
       "purpose": "产品正式登场:打出产品名 + 一句话定位(它是什么、为谁解决什么),配 logo/主界面亮相。",
+      "priority": 5,
+      "minSec": 2.5,
+      "idealSec": 3,
+      "maxSec": 5,
       "suggestedSec": 3,
       "visualHint": "title"
     },
     {
       "role": "feature",
       "purpose": "核心功能亮点 ①:一个功能一个镜头,录屏/界面捕获展示真实操作,配标注与一句卖点。",
+      "priority": 4,
+      "minSec": 3,
+      "idealSec": 4,
+      "maxSec": 7,
       "suggestedSec": 4,
       "visualHint": "product-capture"
     },
     {
       "role": "feature",
       "purpose": "核心功能亮点 ②:第二个差异化功能,feature-reveal 动效逐项展开,强调\"快/简单/效果好\"。",
+      "priority": 3,
+      "minSec": 3,
+      "idealSec": 4,
+      "maxSec": 7,
       "suggestedSec": 4,
       "visualHint": "feature-reveal"
     },
     {
       "role": "feature",
       "purpose": "核心功能亮点 ③:第三个功能或一组小功能快剪,保持节奏密度;3-5 个功能按时长取舍。",
+      "priority": 2,
+      "minSec": 3,
+      "idealSec": 4,
+      "maxSec": 7,
       "suggestedSec": 4,
       "visualHint": "product-capture"
     },
     {
       "role": "proof",
       "purpose": "用数据/效果对比做背书:用户数、节省时间、前后对比、好评等,大数字 + 一句佐证,建立可信度。",
+      "priority": 4,
+      "minSec": 3,
+      "idealSec": 4,
+      "maxSec": 6,
       "suggestedSec": 4,
       "visualHint": "stat"
     },
     {
       "role": "cta",
       "purpose": "行动召唤:打出去哪用、怎么开始(网址/搜索词/二维码),配品牌色收尾定格。",
+      "priority": 5,
+      "minSec": 2,
+      "idealSec": 3,
+      "maxSec": 5,
       "suggestedSec": 3,
       "visualHint": "cta"
     }
@@ -67,5 +99,5 @@
     ]
   },
   "realContentOnly": true,
-  "notes": "重点做\"功能亮点/工作流演示\"段:每个 feature 独立成镜,优先 product-capture(真实录屏)与 feature-reveal(逐项动效)。功能数按总时长伸缩:15s≈2-3 个、30s≈3-4 个、60s 用 heroMode60s 结构。problem 可选,时长紧张时砍掉直接 hook→solution。**做片前先读 docs/showreel-craft.md(情绪曲线+反 slop 清单+审美心法);只用真实产品的色板/文案/素材,禁止编造占位。**"
+  "notes": "重点做\"功能亮点/工作流演示\"段:每个 feature 独立成镜,优先 product-capture(真实录屏)与 feature-reveal(逐项动效)。功能数按总时长伸缩:15s≈2-3 个、30s≈3-4 个、60s 用 heroMode60s 结构。problem 可选,时长紧张时砍掉直接 hook→solution。**做片前先读 docs/showreel-craft.md(情绪曲线+反 slop 清单+审美心法);只用真实产品的色板/文案/素材,禁止编造占位。** 密度拟合:hook/solution/cta priority=5(必选骨架),feature①/proof=4,feature②=3,problem/feature③=2(预算紧先砍)。"
 }

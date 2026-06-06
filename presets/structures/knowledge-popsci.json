@@ -9,39 +9,63 @@
     {
       "role": "hook",
       "purpose": "0-3s 抛出惊奇/悬念/反直觉的问题或画面,瞬间勾住:\"你知道……吗?\"",
+      "priority": 5,
+      "minSec": 2,
+      "idealSec": 3,
+      "maxSec": 5,
       "suggestedSec": 3,
       "visualHint": "kinetic-text"
     },
     {
       "role": "stakes",
       "purpose": "放大好奇:为什么这件事值得知道/有多颠覆认知,给出\"看下去的理由\"。",
+      "priority": 3,
+      "minSec": 3,
+      "idealSec": 5,
+      "maxSec": 8,
       "suggestedSec": 5,
       "visualHint": "kinetic-text"
     },
     {
       "role": "reveal",
       "purpose": "揭秘核心答案:先抛结论(科普先给爽点),再说这是怎么回事。",
+      "priority": 5,
+      "minSec": 6,
+      "idealSec": 10,
+      "maxSec": 16,
       "suggestedSec": 10,
       "visualHint": "feature-reveal"
     },
     {
       "role": "mechanism",
       "purpose": "讲清背后的原理/机制:用类比、图示把复杂的东西讲简单,保持快节奏。",
+      "priority": 4,
+      "minSec": 7,
+      "idealSec": 12,
+      "maxSec": 18,
       "suggestedSec": 12,
       "visualHint": "bullet-list"
     },
     {
       "role": "wow-fact",
       "purpose": "抛出一个震撼数据/极端对比/冷知识做记忆锚点,让人想转发:\"竟然有这么夸张?\"",
+      "priority": 4,
+      "minSec": 5,
+      "idealSec": 8,
+      "maxSec": 12,
       "suggestedSec": 8,
       "visualHint": "stat"
     },
     {
       "role": "cta",
       "purpose": "升华一句 + 引导关注/评论(\"你还想知道什么\"),留钩子到下集。",
+      "priority": 4,
+      "minSec": 3,
+      "idealSec": 5,
+      "maxSec": 7,
       "suggestedSec": 5,
       "visualHint": "cta"
     }
   ],
-  "notes": "科普讲\"爽\":先给结论再讲原理,信息密度高、转场快。wow-fact 是涨粉/转发的关键,务必有一个反差强的数字。比 explainer 更娱乐、更短。"
+  "notes": "科普讲\"爽\":先给结论再讲原理,信息密度高、转场快。wow-fact 是涨粉/转发的关键,务必有一个反差强的数字。比 explainer 更娱乐、更短。密度拟合:hook/reveal priority=5(揭秘骨架),mechanism/wow-fact/cta=4,stakes=3(短片先砍)。"
 }
