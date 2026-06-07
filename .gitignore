@@ -1,5 +1,7 @@
 node_modules/
 .remotion/
-remotion/public/_work/
+remotion/public/*
+!remotion/public/.gitkeep
+vibe-projects/
 *.log
 .DS_Store
