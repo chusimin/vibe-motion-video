@@ -1,5 +1,7 @@
 <div align="center">
 
+<img src="docs/assets/hero.png" alt="vibe-motion-video — 把灵感，渲染成视频" width="100%">
+
 # 🎬 vibe-motion-video
 
 **把任意内容，自动做成「设计师级」视频的端到端流水线。**
@@ -61,20 +63,13 @@
 - **📚 三层知识。** Layer 0 动效宪法（通用物理/节奏）· Layer 1 类型 playbook（showreel 怎么编排）· Layer 2 风格包组件（"好看"活在这一层）。
 - **🔁 拆解 → 沉淀闭环。** 看到喜欢的好片 → `vibemotion teardown` 拆解 → 把规律填进风格包 → 产出质量上升。**架构不变，质量随拆解增长。**
 
+<div align="center"><img src="docs/assets/architecture.png" alt="正交维度架构:类型 × 风格 × 平台 × 时长 像乐高一样拼,Resolver 合并成一张 RenderSpec 施工图" width="100%"></div>
+
 ---
 
 ## 八步流水线
 
-```mermaid
-flowchart LR
-    A[① 读取内容<br/>ingest→brief] --> B[② 拆解定调<br/>config]
-    B --> C{③ 给 2-3 方向<br/>⚠️ 审批门}
-    C --> D{④ 分镜骨架<br/>⚠️ 审批门}
-    D --> E[⑤ 配音 + 字幕对齐<br/>voice]
-    E --> F{⑥ 15s 分段渲染<br/>⚠️ 逐段审批门}
-    F --> G[⑦ 合成 + 体检<br/>assemble→qa]
-    G --> H[⑧ 导出成片<br/>export]
-```
+<div align="center"><img src="docs/assets/pipeline.png" alt="八步流水线:ingest→config→concept→storyboard→voice→render→assemble→export,③④⑥ 三道审批门" width="100%"></div>
 
 | 步 | 干什么 | 谁来做 |
 |---|---|---|
